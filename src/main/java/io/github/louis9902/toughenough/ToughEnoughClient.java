@@ -1,5 +1,6 @@
 package io.github.louis9902.toughenough;
 
+import io.github.louis9902.toughenough.item.Canteen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -15,9 +16,7 @@ public class ToughEnoughClient implements ClientModInitializer {
     }
 
     private static void registerModelPredicates() {
-        FabricModelPredicateProviderRegistry.register(ToughEnough.identifier("empty"), (stack, world, entity) -> {
-            return ElytraItem.isUsable(stack) ? 0.0F : 1.0F;
-        });
+        FabricModelPredicateProviderRegistry.register(ToughEnough.identifier("empty"), (stack, world, entity) -> Canteen.isUsable(stack) ? 0.0F : 1.0F);
     }
 
 }

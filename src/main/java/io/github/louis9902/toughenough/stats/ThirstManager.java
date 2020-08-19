@@ -12,9 +12,11 @@ import net.minecraft.world.GameRules;
 public class ThirstManager {
 
     public static final int MAX_THIRST_LEVEL = 20;
-    public static final int MAX_THIRST_REGENERATION_LEVEL = 18;
+    public static final int MIN_THIRST_REGENERATION_LEVEL = 18;
     public static final float THIRST_EXHAUSTION_THRESHOLD = 4.0f;
+    public static final float HYDRATION_MULTIPLIER_MAGIC_CONSTANT = 2.0F;
 
+    private int prevThirstLevel;
     /**
      * The amount of
      */
@@ -39,7 +41,7 @@ public class ThirstManager {
 
     public void add(int thirst, float hydration) {
         this.thirst = Math.min(MAX_THIRST_LEVEL, this.thirst + thirst);
-        this.hydration = Math.min((float) this.thirst, this.hydration + (thirst * hydration * 2.0F));
+        this.hydration = Math.min((float)this.thirst, this.hydration + (thirst * hydration * HYDRATION_MULTIPLIER_MAGIC_CONSTANT));
     }
 
     public void drink(ItemStack stack) {
@@ -84,7 +86,7 @@ public class ThirstManager {
                         this.addExhaustion(heal / 6.0f);
                         this.counter = 0;
                     }
-                } else if (this.thirst >= MAX_THIRST_REGENERATION_LEVEL) {
+                } else if (this.thirst >= MIN_THIRST_REGENERATION_LEVEL) {
                     // if we dont have hydration anymore we drain some of the normal thirst
                     if (this.counter >= 80 /* 4 sec */) {
                         player.heal(1.0F);
@@ -140,5 +142,17 @@ public class ThirstManager {
 
     public void setExhaustion(float exhaustion) {
         this.exhaustion = exhaustion;
+    }
+
+    public int getThirst() {
+        return thirst;
+    }
+
+    public float getHydration() {
+        return hydration;
+    }
+
+    public float getExhaustion() {
+        return exhaustion;
     }
 }

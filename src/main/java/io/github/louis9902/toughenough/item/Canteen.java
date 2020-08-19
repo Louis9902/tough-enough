@@ -1,5 +1,6 @@
 package io.github.louis9902.toughenough.item;
 
+import io.github.louis9902.toughenough.stats.Thirsty;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -21,7 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
 
-public class Canteen extends Item {
+public class Canteen extends Item implements Drinkable{
     public Canteen(Settings settings) {
         super(settings);
     }
@@ -37,8 +38,7 @@ public class Canteen extends Item {
 
         }
         if (user instanceof PlayerEntity) {
-            System.out.println("used!");
-            stack.damage(1, user, (e) -> System.out.println("Item is consumed"));
+            return drinkFromCanteen(world, (PlayerEntity) user, user.getActiveHand()).getValue();
         }
 
         return stack;
@@ -46,6 +46,8 @@ public class Canteen extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+
+
         //calculate whether the played used the item on a fluid source block
         HitResult hitResult = rayTrace(world, user, RayTraceContext.FluidHandling.SOURCE_ONLY);
 
@@ -55,7 +57,7 @@ public class Canteen extends Item {
 
             //player cannot modify block -> we can only drink
             if (!world.canPlayerModifyAt(user, blockPos))
-                return ItemUsage.consumeHeldItem(world, user, hand);
+                return consumeIfUsable(world, user, hand);
 
             //Player has hit water block -> fill canteen & play sound
             if (world.getFluidState(blockPos).isIn(FluidTags.WATER)) {
@@ -64,18 +66,25 @@ public class Canteen extends Item {
             }
         }
         //did not hit a block or it was not water, definitely drink
-        return ItemUsage.consumeHeldItem(world, user, hand);
+        return consumeIfUsable(world, user, hand);
     }
 
     public TypedActionResult<ItemStack> drinkFromCanteen(World world, PlayerEntity user, Hand hand) {
-        System.out.println("drinking!");
+        System.out.println("Canteen.drinkFromCanteen");
         ItemStack itemStack = user.getStackInHand(hand);
-        itemStack.damage(1, user, (e) -> System.out.println("Item is consumed"));
-        return TypedActionResult.consume(itemStack);
+        if (isUsable(itemStack)) {
+            System.out.println("drinking!");
+            itemStack.damage(1, user, (e) -> {
+                throw new IllegalStateException("canteen shouldnt be broken!");
+            });
+            ((Thirsty) user).getThirstManager().drink(itemStack);
+            return TypedActionResult.consume(itemStack);
+        }
+        return TypedActionResult.pass(itemStack);
     }
 
     public TypedActionResult<ItemStack> fillCanteen(World world, PlayerEntity user, Hand hand) {
-        System.out.println("fillinga!");
+        System.out.println("Canteen.fillCanteen");
         ItemStack itemStack = user.getStackInHand(hand);
         itemStack.setDamage(0);
         return TypedActionResult.success(itemStack);
@@ -96,5 +105,25 @@ public class Canteen extends Item {
         return UseAction.DRINK;
     }
 
+    public static boolean isUsable(ItemStack stack) {
+        //maximum damage is reserved for "broken" model state
+        return stack.getDamage() < stack.getMaxDamage() - 1;
+    }
 
+    private TypedActionResult<ItemStack> consumeIfUsable(World world, PlayerEntity user, Hand hand) {
+        if (isUsable(user.getStackInHand(hand)))
+            return ItemUsage.consumeHeldItem(world, user, hand);
+        else
+            return TypedActionResult.pass(user.getStackInHand(hand));
+    }
+
+    @Override
+    public int getThirst() {
+        return 4;
+    }
+
+    @Override
+    public float getHydrationModifier() {
+        return 2;
+    }
 }
