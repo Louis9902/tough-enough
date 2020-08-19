@@ -3,6 +3,14 @@ plugins {
     id 'maven-publish'
 }
 
+//repository for CardinalComponents Source: https://github.com/OnyxStudios/Cardinal-Components-API/wiki/Installation-(for-developers)
+repositories {
+    maven {
+        name = "Ladysnake Libs"
+        url = 'https://dl.bintray.com/ladysnake/libs'
+    }
+}
+
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -21,6 +29,10 @@ dependencies {
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
+
+    modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:$project.cardinal_components_version"
+    modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:$project.cardinal_components_version"
+    modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-item:$project.cardinal_components_version"
 }
 
 processResources {

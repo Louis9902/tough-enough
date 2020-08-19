@@ -27,7 +27,6 @@ public class Canteen extends Item implements Drinkable{
         super(settings);
     }
 
-
     @Override
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
         System.out.println("finished using was called");
@@ -46,8 +45,6 @@ public class Canteen extends Item implements Drinkable{
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-
-
         //calculate whether the played used the item on a fluid source block
         HitResult hitResult = rayTrace(world, user, RayTraceContext.FluidHandling.SOURCE_ONLY);
 
@@ -74,9 +71,12 @@ public class Canteen extends Item implements Drinkable{
         ItemStack itemStack = user.getStackInHand(hand);
         if (isUsable(itemStack)) {
             System.out.println("drinking!");
+
+            //Canteen shouldn't break at any point as we have a broken state, if it happens we throw an exception
             itemStack.damage(1, user, (e) -> {
                 throw new IllegalStateException("canteen shouldnt be broken!");
             });
+
             ((Thirsty) user).getThirstManager().drink(itemStack);
             return TypedActionResult.consume(itemStack);
         }
@@ -110,6 +110,7 @@ public class Canteen extends Item implements Drinkable{
         return stack.getDamage() < stack.getMaxDamage() - 1;
     }
 
+    //Make sure the player can only drink if the canteen wouldn't reach its reserved damage value
     private TypedActionResult<ItemStack> consumeIfUsable(World world, PlayerEntity user, Hand hand) {
         if (isUsable(user.getStackInHand(hand)))
             return ItemUsage.consumeHeldItem(world, user, hand);
