@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "toughenough",
+  "version": "${version}",
+  "name": "Tough Enough",
+  "description": "",
+  "authors": [
+    "Louis9902",
+    "manymoney2"
+  ],
+  "contact": {
+    "repo": "https://github.com/louis9902/tough-enough"
+  },
+  "license": "GPL-3.0",
+  "icon": "assets/toughenough/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "io.github.louis9902.toughenough.ToughEnoughClient"
+    ],
+    "main": [
+      "io.github.louis9902.toughenough.ToughEnough"
+    ]
+  },
+  "mixins": [
+    "toughenough.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.9.2+build.206",
+    "fabric": "*",
+    "minecraft": "1.16.2"
+  }
+}
