@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "toughenough",
+  "id": "tough_enough",
   "version": "${version}",
   "name": "Tough Enough",
   "description": "",
@@ -12,7 +12,7 @@
     "repo": "https://github.com/louis9902/tough-enough"
   },
   "license": "GPL-3.0",
-  "icon": "assets/toughenough/icon.png",
+  "icon": "assets/tough_enough/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [
@@ -23,7 +23,7 @@
     ]
   },
   "mixins": [
-    "toughenough.mixins.json"
+    "tough_enough.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.9.2+build.206",
