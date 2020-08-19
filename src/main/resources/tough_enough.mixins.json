@@ -4,6 +4,7 @@
   "package": "io.github.louis9902.toughenough.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "PlayerEntityMixin"
   ],
   "client": [
   ],

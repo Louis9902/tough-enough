@@ -1,0 +1,14 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "tough_enough:item/canteen"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "tough_enough:empty": 1
+      },
+      "model": "tough_enough:item/canteen_empty"
+    }
+  ]
+}
