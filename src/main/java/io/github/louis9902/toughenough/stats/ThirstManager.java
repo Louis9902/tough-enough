@@ -1,15 +1,20 @@
 package io.github.louis9902.toughenough.stats;
 
+import io.github.louis9902.toughenough.init.Gameplay;
 import io.github.louis9902.toughenough.item.Drinkable;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.GameRules;
 
 public class ThirstManager {
 
     public static final int MAX_THIRST_LEVEL = 20;
+    public static final int MAX_THIRST_REGENERATION_LEVEL = 18;
+    public static final float THIRST_EXHAUSTION_THRESHOLD = 4.0f;
 
-    private int prevThirstLevel;
     /**
      * The amount of
      */
@@ -21,7 +26,11 @@ public class ThirstManager {
     private float hydration;
     private float exhaustion;
 
-    private int thirstTimer;
+    /**
+     * This value represents the time passed since the user took the last time
+     * damage because of thirst.
+     */
+    private int counter;
 
     public ThirstManager() {
         thirst = 20;
@@ -40,8 +49,66 @@ public class ThirstManager {
         }
     }
 
-    public void update(PlayerEntity player) {
+    private static boolean canPlayerRegenerateHealth(PlayerEntity player) {
+        return player.getHealth() > 0.0f && player.getHealth() < player.getMaxHealth();
+    }
 
+    public void update(PlayerEntity player) {
+        if (!Gameplay.ENABLE_THIRST || player.isCreative()) return;
+
+        Difficulty difficulty = player.world.getDifficulty();
+
+        // if the exhaustion is higher than the max we normalise
+        if (this.exhaustion > THIRST_EXHAUSTION_THRESHOLD) {
+            this.exhaustion -= THIRST_EXHAUSTION_THRESHOLD;
+
+            if (this.hydration > 0.0f) {
+                // if we have hydration we drain some of it
+                this.hydration = Math.max(this.hydration - 1.0f, 0.0f);
+            } else if (difficulty != Difficulty.PEACEFUL) {
+                // otherwise we drain the thirst
+                this.thirst = Math.max(this.thirst - 1, 0);
+            }
+            // TODO: make food also dependant on thirst and the other way around
+            boolean regenerate = player.world.getGameRules().getBoolean(GameRules.NATURAL_REGENERATION);
+
+            if (regenerate && canPlayerRegenerateHealth(player)) {
+                // check if player can regenerate naturally
+                this.counter++;
+
+                if (this.thirst >= MAX_THIRST_LEVEL && this.hydration > 0.0f) {
+                    // if so we want to use the fast regeneration first (hydration)
+                    if (this.counter >= 10 /* 0.5 sec */) {
+                        float heal = Math.min(this.hydration, 6.0f);
+                        player.heal(heal / 6.0f);
+                        this.addExhaustion(heal / 6.0f);
+                        this.counter = 0;
+                    }
+                } else if (this.thirst >= MAX_THIRST_REGENERATION_LEVEL) {
+                    // if we dont have hydration anymore we drain some of the normal thirst
+                    if (this.counter >= 80 /* 4 sec */) {
+                        player.heal(1.0F);
+                        this.addExhaustion(6.0f);
+                        this.counter = 0;
+                    }
+                }
+            } else if (this.thirst <= 0) {
+                // check if player needs to get some damage because of thirst
+                this.counter++;
+                if (this.counter >= 80 /* 4 sec */) {
+                    boolean bypass = player.getHealth() > 10.0F;
+                    boolean isHard = difficulty == Difficulty.HARD;
+                    boolean isNormal = difficulty == Difficulty.NORMAL && player.getHealth() > 1.0F;
+                    if (bypass || isHard || isNormal) {
+                        player.damage(DamageSource.STARVE, 1.0F);
+                    }
+                    this.counter = 0;
+                }
+            } else {
+                // just do nothing here keep counter low
+                this.counter = 0;
+            }
+        }
     }
 
     public void fromTag(CompoundTag compound) {
@@ -56,6 +123,11 @@ public class ThirstManager {
         compound.putInt("thirstLevel", this.thirst);
         compound.putFloat("thirstHydrationLevel", this.hydration);
         compound.putFloat("thirstExhaustionLevel", this.exhaustion);
+    }
+
+    public void addExhaustion(float exhaustion) {
+        // INVESTIGATE: may need some bounds check
+        this.exhaustion += exhaustion;
     }
 
     public void setThirst(int thirst) {
