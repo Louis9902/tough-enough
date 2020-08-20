@@ -1,5 +1,6 @@
 package io.github.louis9902.toughenough.StatusEffect;
 
+import io.github.louis9902.toughenough.MyComponents;
 import io.github.louis9902.toughenough.ToughEnough;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
@@ -12,7 +13,7 @@ public class Thirst extends StatusEffect {
 
     @Override
     public void applyUpdateEffect(LivingEntity entity, int amplifier) {
-        ToughEnough.THIRSTY.maybeGet(entity).ifPresent(
+        MyComponents.THIRSTY.maybeGet(entity).ifPresent(
                 (thirstyManager -> thirstyManager.setExhaustion(thirstyManager.getExhaustion() + getExhaustionModifier(amplifier))));
     }
 

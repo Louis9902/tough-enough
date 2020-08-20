@@ -1,5 +1,6 @@
 package io.github.louis9902.toughenough.components.implementations;
 
+import io.github.louis9902.toughenough.MyComponents;
 import io.github.louis9902.toughenough.ToughEnough;
 import io.github.louis9902.toughenough.components.DrinkableComponent;
 import nerdhub.cardinal.components.api.ComponentType;
@@ -40,6 +41,6 @@ public class DrinkableComponentImpl implements DrinkableComponent {
 
     @Override
     public @NotNull ComponentType<?> getComponentType() {
-        return ToughEnough.DRINKABLE;
+        return MyComponents.DRINKABLE;
     }
 }

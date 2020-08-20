@@ -1,5 +1,6 @@
 package io.github.louis9902.toughenough.components.implementations;
 
+import io.github.louis9902.toughenough.MyComponents;
 import io.github.louis9902.toughenough.ToughEnough;
 import io.github.louis9902.toughenough.components.DrinkableComponent;
 import io.github.louis9902.toughenough.components.ThirstyManager;
@@ -42,7 +43,7 @@ public class ThirstyManagerImpl implements ThirstyManager {
 
     @Override
     public void drink(ItemStack item) {
-        Optional<DrinkableComponent> drink = ToughEnough.DRINKABLE.maybeGet(item);
+        Optional<DrinkableComponent> drink =  MyComponents.DRINKABLE.maybeGet(item);
         if(drink.isPresent()){
             thirst+=drink.get().getThirst();
             hydration+=drink.get().getHydrationModifier();

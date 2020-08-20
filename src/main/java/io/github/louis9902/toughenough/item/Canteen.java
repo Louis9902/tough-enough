@@ -1,5 +1,6 @@
 package io.github.louis9902.toughenough.item;
 
+import io.github.louis9902.toughenough.MyComponents;
 import io.github.louis9902.toughenough.ToughEnough;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.LivingEntity;
@@ -77,7 +78,7 @@ public class Canteen extends Item{
                 throw new IllegalStateException("canteen shouldnt be broken!");
             });
 
-            ToughEnough.THIRSTY.maybeGet(user).ifPresent(thirstyManagerInterface -> thirstyManagerInterface.drink(itemStack));
+            MyComponents.THIRSTY.maybeGet(user).ifPresent(thirstyManagerInterface -> thirstyManagerInterface.drink(itemStack));
 
             return TypedActionResult.consume(itemStack);
         }

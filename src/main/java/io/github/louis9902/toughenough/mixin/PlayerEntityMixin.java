@@ -1,5 +1,6 @@
 package io.github.louis9902.toughenough.mixin;
 
+import io.github.louis9902.toughenough.MyComponents;
 import io.github.louis9902.toughenough.ToughEnough;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -22,7 +23,7 @@ public abstract class PlayerEntityMixin extends Entity {
             target = "Lnet/minecraft/entity/player/PlayerEntity;incrementStat(Lnet/minecraft/util/Identifier;)V"
     ))
     public void tickInject(CallbackInfo ci) {
-        ToughEnough.THIRSTY.get(this).update((PlayerEntity) (Object) this);
+        MyComponents.THIRSTY.get(this).update((PlayerEntity) (Object) this);
     }
 
 }
