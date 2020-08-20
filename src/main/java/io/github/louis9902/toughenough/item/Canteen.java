@@ -1,6 +1,6 @@
 package io.github.louis9902.toughenough.item;
 
-import io.github.louis9902.toughenough.stats.Thirsty;
+import io.github.louis9902.toughenough.ToughEnough;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,7 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
 
-public class Canteen extends Item implements Drinkable{
+public class Canteen extends Item{
     public Canteen(Settings settings) {
         super(settings);
     }
@@ -77,7 +77,8 @@ public class Canteen extends Item implements Drinkable{
                 throw new IllegalStateException("canteen shouldnt be broken!");
             });
 
-            ((Thirsty) user).getThirstManager().drink(itemStack);
+            ToughEnough.THIRSTY.maybeGet(user).ifPresent(thirstyManagerInterface -> thirstyManagerInterface.drink(itemStack));
+
             return TypedActionResult.consume(itemStack);
         }
         return TypedActionResult.pass(itemStack);
@@ -116,15 +117,5 @@ public class Canteen extends Item implements Drinkable{
             return ItemUsage.consumeHeldItem(world, user, hand);
         else
             return TypedActionResult.pass(user.getStackInHand(hand));
-    }
-
-    @Override
-    public int getThirst() {
-        return 4;
-    }
-
-    @Override
-    public float getHydrationModifier() {
-        return 2;
     }
 }

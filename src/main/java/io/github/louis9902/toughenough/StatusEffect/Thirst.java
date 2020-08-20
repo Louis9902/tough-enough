@@ -1,11 +1,9 @@
 package io.github.louis9902.toughenough.StatusEffect;
 
-import io.github.louis9902.toughenough.stats.ThirstManager;
-import io.github.louis9902.toughenough.stats.Thirsty;
+import io.github.louis9902.toughenough.ToughEnough;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectType;
-import net.minecraft.entity.player.PlayerEntity;
 
 public class Thirst extends StatusEffect {
     public Thirst(StatusEffectType type, int color) {
@@ -14,12 +12,8 @@ public class Thirst extends StatusEffect {
 
     @Override
     public void applyUpdateEffect(LivingEntity entity, int amplifier) {
-        if (entity instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) entity;
-            ThirstManager thirst = ((Thirsty) player).getThirstManager();
-            thirst.setExhaustion(thirst.getExhaustion() + getExhaustionModifier(amplifier));
-            System.out.println("Thirst.applyUpdateEffect");
-        }
+        ToughEnough.THIRSTY.maybeGet(entity).ifPresent(
+                (thirstyManager -> thirstyManager.setExhaustion(thirstyManager.getExhaustion() + getExhaustionModifier(amplifier))));
     }
 
     @Override
