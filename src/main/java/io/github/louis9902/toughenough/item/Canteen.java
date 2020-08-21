@@ -30,7 +30,7 @@ public class Canteen extends Item{
 
     @Override
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
-        System.out.println("finished using was called");
+        System.out.println("Canteen.finishUsing");
         if (!world.isClient) {
             ServerPlayerEntity player = (ServerPlayerEntity) user;
             Criteria.CONSUME_ITEM.trigger(player, stack);
@@ -46,6 +46,7 @@ public class Canteen extends Item{
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        System.out.println("Canteen.use");
         //calculate whether the played used the item on a fluid source block
         HitResult hitResult = rayTrace(world, user, RayTraceContext.FluidHandling.SOURCE_ONLY);
 

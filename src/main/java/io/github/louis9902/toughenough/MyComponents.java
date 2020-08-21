@@ -1,5 +1,6 @@
 package io.github.louis9902.toughenough;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.item.ItemComponentFactoryRegistry;
@@ -20,9 +21,10 @@ public class MyComponents implements ItemComponentInitializer, EntityComponentIn
     public static final ComponentType<ThirstyManager> THIRSTY = ComponentRegistry.INSTANCE.registerStatic(identifier("thirsty"), ThirstyManager.class);
 
 
+
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        registry.registerFor(PlayerEntity.class, THIRSTY, ThirstyManagerImpl::new);
+        registry.registerForPlayers(THIRSTY, ThirstyManagerImpl::new);
     }
 
     @Override

@@ -54,6 +54,7 @@ public class ThirstyManagerImpl implements ThirstyManager {
 
     @Override
     public void update(PlayerEntity player) {
+        System.out.println("ThirstyManagerImpl.update");
         if (!Gameplay.ENABLE_THIRST || player.isCreative()) return;
 
         Difficulty difficulty = player.world.getDifficulty();
