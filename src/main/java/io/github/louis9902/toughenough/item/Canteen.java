@@ -1,7 +1,6 @@
 package io.github.louis9902.toughenough.item;
 
 import io.github.louis9902.toughenough.MyComponents;
-import io.github.louis9902.toughenough.ToughEnough;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -30,7 +29,6 @@ public class Canteen extends Item{
 
     @Override
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
-        System.out.println("Canteen.finishUsing");
         if (!world.isClient) {
             ServerPlayerEntity player = (ServerPlayerEntity) user;
             Criteria.CONSUME_ITEM.trigger(player, stack);
@@ -46,7 +44,6 @@ public class Canteen extends Item{
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        System.out.println("Canteen.use");
         //calculate whether the played used the item on a fluid source block
         HitResult hitResult = rayTrace(world, user, RayTraceContext.FluidHandling.SOURCE_ONLY);
 
@@ -69,10 +66,8 @@ public class Canteen extends Item{
     }
 
     public TypedActionResult<ItemStack> drinkFromCanteen(World world, PlayerEntity user, Hand hand) {
-        System.out.println("Canteen.drinkFromCanteen");
         ItemStack itemStack = user.getStackInHand(hand);
         if (isUsable(itemStack)) {
-            System.out.println("drinking!");
 
             //Canteen shouldn't break at any point as we have a broken state, if it happens we throw an exception
             itemStack.damage(1, user, (e) -> {
@@ -87,7 +82,6 @@ public class Canteen extends Item{
     }
 
     public TypedActionResult<ItemStack> fillCanteen(World world, PlayerEntity user, Hand hand) {
-        System.out.println("Canteen.fillCanteen");
         ItemStack itemStack = user.getStackInHand(hand);
         itemStack.setDamage(0);
         return TypedActionResult.success(itemStack);

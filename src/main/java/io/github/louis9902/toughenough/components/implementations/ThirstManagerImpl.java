@@ -1,9 +1,8 @@
 package io.github.louis9902.toughenough.components.implementations;
 
 import io.github.louis9902.toughenough.MyComponents;
-import io.github.louis9902.toughenough.ToughEnough;
 import io.github.louis9902.toughenough.components.DrinkableComponent;
-import io.github.louis9902.toughenough.components.ThirstyManager;
+import io.github.louis9902.toughenough.components.ThirstManager;
 import io.github.louis9902.toughenough.init.Gameplay;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
@@ -17,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public class ThirstyManagerImpl implements ThirstyManager {
+public class ThirstManagerImpl implements ThirstManager {
     private static final int MAX_THIRST_LEVEL = 20;
     private static final int MIN_THIRST_REGENERATION_LEVEL = 18;
     private static final float THIRST_EXHAUSTION_THRESHOLD = 4.0f;
@@ -37,7 +36,7 @@ public class ThirstyManagerImpl implements ThirstyManager {
     //Synced Components need to store the entity they are attached to
     final Entity provider;
 
-    public ThirstyManagerImpl(Entity provider) {
+    public ThirstManagerImpl(Entity provider) {
         this.provider = provider;
     }
 
@@ -54,7 +53,11 @@ public class ThirstyManagerImpl implements ThirstyManager {
 
     @Override
     public void update(PlayerEntity player) {
-        System.out.println("ThirstyManagerImpl.update");
+        System.out.println("thirst:" + thirst);
+        System.out.println("hydration:" + hydration);
+        System.out.println("exhaustion:" + exhaustion);
+        System.out.println();
+
         if (!Gameplay.ENABLE_THIRST || player.isCreative()) return;
 
         Difficulty difficulty = player.world.getDifficulty();
@@ -152,7 +155,7 @@ public class ThirstyManagerImpl implements ThirstyManager {
     //belongs to, this is to save network traffic!
     @Override
     public void syncWith(ServerPlayerEntity player) {
-        if (player == this.provider) ThirstyManager.super.syncWith(player);
+        if (player == this.provider) ThirstManager.super.syncWith(player);
     }
 
     //region Getters and Setters
