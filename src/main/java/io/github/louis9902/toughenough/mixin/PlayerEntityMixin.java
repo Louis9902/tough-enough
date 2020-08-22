@@ -4,13 +4,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import static io.github.louis9902.toughenough.ToughEnoughComponents.DRINKABLE;
 import static io.github.louis9902.toughenough.ToughEnoughComponents.THIRSTY;
 
 @Mixin(PlayerEntity.class)
@@ -27,11 +30,10 @@ public abstract class PlayerEntityMixin extends Entity {
      * If the component is not present for some reason, nothing will be done
      */
     @Inject(method = "tick", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/entity/player/PlayerEntity;incrementStat(Lnet/minecraft/util/Identifier;)V"
-    ))
+            value = "HEAD"))
     public void tick(CallbackInfo ci) {
-        THIRSTY.maybeGet(this).ifPresent((val) -> val.update((PlayerEntity) (Object) this));
+        if (!world.isClient)
+            THIRSTY.maybeGet(this).ifPresent((val) -> val.update((PlayerEntity) (Object) this));
     }
 
     /**
@@ -48,5 +50,18 @@ public abstract class PlayerEntityMixin extends Entity {
     public void addExhaustion(HungerManager manager, float exhaustion) {
         manager.addExhaustion(exhaustion);
         THIRSTY.maybeGet(this).ifPresent((val) -> val.addExhaustion(exhaustion));
+    }
+
+    /**
+     * Each time the player eats food, we also need to check weather the eaten food has a thirst component aswell,
+     * if yes we need to drink it.
+     */
+    @Inject(method = "eatFood", at = @At(
+            value = "HEAD"
+    ))
+    private void eatFood(CallbackInfoReturnable<ItemStack> ci, World world, ItemStack stack) {
+        DRINKABLE.maybeGet(stack)
+                .flatMap(drink -> THIRSTY.maybeGet(this))
+                .ifPresent((thirsty) -> thirsty.drink(stack));
     }
 }
