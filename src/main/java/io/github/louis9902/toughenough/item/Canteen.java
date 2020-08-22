@@ -1,6 +1,6 @@
 package io.github.louis9902.toughenough.item;
 
-import io.github.louis9902.toughenough.stats.Thirsty;
+import io.github.louis9902.toughenough.MyComponents;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,14 +22,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
 
-public class Canteen extends Item implements Drinkable{
+public class Canteen extends Item{
     public Canteen(Settings settings) {
         super(settings);
     }
 
     @Override
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
-        System.out.println("finished using was called");
         if (!world.isClient) {
             ServerPlayerEntity player = (ServerPlayerEntity) user;
             Criteria.CONSUME_ITEM.trigger(player, stack);
@@ -67,24 +66,22 @@ public class Canteen extends Item implements Drinkable{
     }
 
     public TypedActionResult<ItemStack> drinkFromCanteen(World world, PlayerEntity user, Hand hand) {
-        System.out.println("Canteen.drinkFromCanteen");
         ItemStack itemStack = user.getStackInHand(hand);
         if (isUsable(itemStack)) {
-            System.out.println("drinking!");
 
             //Canteen shouldn't break at any point as we have a broken state, if it happens we throw an exception
             itemStack.damage(1, user, (e) -> {
                 throw new IllegalStateException("canteen shouldnt be broken!");
             });
 
-            ((Thirsty) user).getThirstManager().drink(itemStack);
+            MyComponents.THIRSTY.maybeGet(user).ifPresent(thirstyManagerInterface -> thirstyManagerInterface.drink(itemStack));
+
             return TypedActionResult.consume(itemStack);
         }
         return TypedActionResult.pass(itemStack);
     }
 
     public TypedActionResult<ItemStack> fillCanteen(World world, PlayerEntity user, Hand hand) {
-        System.out.println("Canteen.fillCanteen");
         ItemStack itemStack = user.getStackInHand(hand);
         itemStack.setDamage(0);
         return TypedActionResult.success(itemStack);
@@ -116,15 +113,5 @@ public class Canteen extends Item implements Drinkable{
             return ItemUsage.consumeHeldItem(world, user, hand);
         else
             return TypedActionResult.pass(user.getStackInHand(hand));
-    }
-
-    @Override
-    public int getThirst() {
-        return 4;
-    }
-
-    @Override
-    public float getHydrationModifier() {
-        return 2;
     }
 }

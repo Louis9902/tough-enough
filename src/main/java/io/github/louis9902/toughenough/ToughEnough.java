@@ -4,7 +4,6 @@ import io.github.louis9902.toughenough.StatusEffect.Thirst;
 import io.github.louis9902.toughenough.item.Canteen;
 import io.github.louis9902.toughenough.init.Gameplay;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectType;
 import net.minecraft.item.Item;
@@ -14,11 +13,11 @@ import net.minecraft.util.registry.Registry;
 
 
 public class ToughEnough implements ModInitializer {
-    public static String MOD_ID = "tough_enough";
-    public static ItemGroup MOD_GROUP = FabricItemGroupBuilder.create(identifier("tough_enough")).build();
+    public static final String MOD_ID = "tough_enough";
 
-    public static final Item canteen = Registry.register(Registry.ITEM, identifier("canteen"), new Canteen(new Item.Settings().group(MOD_GROUP).maxDamage(4)));
-    public static final StatusEffect thirst = Registry.register(Registry.STATUS_EFFECT, identifier("thirst"), new Thirst(StatusEffectType.HARMFUL, 1));
+    //removed mod item group for now as it kept crashing!
+    public static final Item CANTEEN_ITEM = Registry.register(Registry.ITEM, identifier("canteen"), new Canteen(new Item.Settings().group(ItemGroup.MISC).maxDamage(4)));
+    public static final StatusEffect THIRST_EFFECT = Registry.register(Registry.STATUS_EFFECT, identifier("thirst"), new Thirst(StatusEffectType.HARMFUL, 1));
 
     @Override
     public void onInitialize() {
