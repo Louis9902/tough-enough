@@ -1,17 +1,16 @@
-package io.github.louis9902.toughenough.components.implementations;
+package io.github.louis9902.toughenough.components.defaults;
 
-import io.github.louis9902.toughenough.MyComponents;
-import io.github.louis9902.toughenough.ToughEnough;
-import io.github.louis9902.toughenough.components.DrinkableComponent;
+import io.github.louis9902.toughenough.ToughEnoughComponents;
+import io.github.louis9902.toughenough.components.Drinkable;
 import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 
-public class DrinkableComponentImpl implements DrinkableComponent {
+public class DefaultDrinkable implements Drinkable {
     int thirst;
     float hydrationModifier;
 
-    public DrinkableComponentImpl(int thirst, float hydrationModifier) {
+    public DefaultDrinkable(int thirst, float hydrationModifier) {
         this.thirst = thirst;
         this.hydrationModifier = hydrationModifier;
     }
@@ -41,6 +40,6 @@ public class DrinkableComponentImpl implements DrinkableComponent {
 
     @Override
     public @NotNull ComponentType<?> getComponentType() {
-        return MyComponents.DRINKABLE;
+        return ToughEnoughComponents.DRINKABLE;
     }
 }

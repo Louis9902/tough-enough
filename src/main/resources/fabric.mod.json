@@ -22,10 +22,10 @@
       "io.github.louis9902.toughenough.ToughEnough"
     ],
     "cardinal-components-entity": [
-      "io.github.louis9902.toughenough.MyComponents"
+      "io.github.louis9902.toughenough.ToughEnoughComponents"
     ],
     "cardinal-components-item": [
-      "io.github.louis9902.toughenough.MyComponents"
+      "io.github.louis9902.toughenough.ToughEnoughComponents"
     ]
   },
   "custom": {

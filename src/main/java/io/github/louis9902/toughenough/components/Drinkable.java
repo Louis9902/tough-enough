@@ -7,7 +7,7 @@ import nerdhub.cardinal.components.api.component.extension.CopyableComponent;
  * Thirst is the thirst level that will be restored
  * Hydration is the amount of thirst that is saved beyond the normal thirst bar (equivalent to saturation of hunger)
  */
-public interface DrinkableComponent extends CopyableComponent<DrinkableComponent> {
+public interface Drinkable extends CopyableComponent<Drinkable> {
     int getThirst();
 
     float getHydrationModifier();
