@@ -2,6 +2,7 @@ package io.github.louis9902.toughenough;
 
 import io.github.louis9902.toughenough.StatusEffect.Thirst;
 import io.github.louis9902.toughenough.item.Canteen;
+import io.github.louis9902.toughenough.init.Gameplay;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectType;
@@ -20,6 +21,8 @@ public class ToughEnough implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        Gameplay.register();
+
     }
 
     public static Identifier identifier(String name) {
