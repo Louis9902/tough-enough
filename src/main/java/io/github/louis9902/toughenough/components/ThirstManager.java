@@ -1,10 +1,10 @@
 package io.github.louis9902.toughenough.components;
 
-import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
-public interface ThirstManager extends EntitySyncedComponent {
+public interface ThirstManager extends AutoSyncedComponent {
 
     int getThirst();
 

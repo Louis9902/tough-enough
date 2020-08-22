@@ -12,9 +12,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+
+import static io.github.louis9902.toughenough.ToughEnoughComponents.THIRSTY;
 
 public class DefaultThirstManager implements ThirstManager {
     private static final int MAX_THIRST_LEVEL = 20;
@@ -53,6 +54,10 @@ public class DefaultThirstManager implements ThirstManager {
 
     @Override
     public void update(PlayerEntity player) {
+        System.out.println("DefaultThirstManager.update");
+        System.out.println(thirst);
+        System.out.println(hydration);
+        System.out.println(exhaustion);
         if (!Gameplay.isThirstEnabled(player.world) || player.isCreative()) return;
 
         Difficulty difficulty = player.world.getDifficulty();
@@ -126,12 +131,7 @@ public class DefaultThirstManager implements ThirstManager {
     }
 
     @Override
-    public @NotNull Entity getEntity() {
-        return provider;
-    }
-
-    @Override
-    public void fromTag(CompoundTag tag) {
+    public void readFromNbt(CompoundTag tag) {
         thirst = tag.getInt("thirst");
         hydration = tag.getFloat("hydration");
         exhaustion = tag.getFloat("exhaustion");
@@ -139,18 +139,21 @@ public class DefaultThirstManager implements ThirstManager {
     }
 
     @Override
-    public @NotNull CompoundTag toTag(CompoundTag tag) {
+    public void writeToNbt(CompoundTag tag) {
         tag.putInt("thirst", thirst);
         tag.putFloat("hydration", hydration);
         tag.putFloat("exhaustion", exhaustion);
-        return tag;
     }
 
-    //We override this so that callling sync() only transmits the thirst information to the player it
+    //We override this so that calling sync() only transmits the thirst information to the player it
     //belongs to, this is to save network traffic!
     @Override
-    public void syncWith(ServerPlayerEntity player) {
-        if (player == this.provider) ThirstManager.super.syncWith(player);
+    public boolean shouldSyncWith(ServerPlayerEntity player) {
+        return player == this.provider;
+    }
+
+    private void sync() {
+        THIRSTY.sync(provider);
     }
 
     //region Getters and Setters
@@ -171,20 +174,20 @@ public class DefaultThirstManager implements ThirstManager {
 
     @Override
     public void setThirst(int t) {
-        sync();
         thirst = t;
+        sync();
     }
 
     @Override
     public void setHydration(float h) {
-        sync();
         hydration = h;
+        sync();
     }
 
     @Override
     public void setExhaustion(float e) {
-        sync();
         exhaustion = e;
+        sync();
     }
     //endregion
 }

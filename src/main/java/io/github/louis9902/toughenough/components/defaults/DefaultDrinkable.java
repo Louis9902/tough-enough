@@ -1,10 +1,7 @@
 package io.github.louis9902.toughenough.components.defaults;
 
-import io.github.louis9902.toughenough.ToughEnoughComponents;
 import io.github.louis9902.toughenough.components.Drinkable;
-import nerdhub.cardinal.components.api.ComponentType;
 import net.minecraft.nbt.CompoundTag;
-import org.jetbrains.annotations.NotNull;
 
 public class DefaultDrinkable implements Drinkable {
     int thirst;
@@ -26,20 +23,26 @@ public class DefaultDrinkable implements Drinkable {
     }
 
     @Override
-    public void fromTag(CompoundTag compoundTag) {
-        thirst = compoundTag.getInt("thirst");
-        hydrationModifier = compoundTag.getFloat("hydration");
+    public void readFromNbt(CompoundTag tag) {
+        thirst = tag.getInt("thirst");
+        hydrationModifier = tag.getFloat("hydration");
     }
 
     @Override
-    public @NotNull CompoundTag toTag(CompoundTag compoundTag) {
-        compoundTag.putInt("thirst", thirst);
-        compoundTag.putFloat("hydration", hydrationModifier);
-        return compoundTag;
+    public void writeToNbt(CompoundTag tag) {
+        tag.putInt("thirst", thirst);
+        tag.putFloat("hydration", hydrationModifier);
     }
 
+    //Item components should implement proper equals methods as they might be checked against
     @Override
-    public @NotNull ComponentType<?> getComponentType() {
-        return ToughEnoughComponents.DRINKABLE;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DefaultDrinkable that = (DefaultDrinkable) o;
+
+        if (thirst != that.thirst) return false;
+        return Float.compare(that.hydrationModifier, hydrationModifier) == 0;
     }
 }

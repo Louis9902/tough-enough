@@ -31,7 +31,8 @@
   "custom": {
     "cardinal-components": [
       "tough_enough:drinkable",
-      "tough_enough:thirsty"
+      "tough_enough:thirsty",
+      "tough_enough:heaty"
     ]
   },
   "mixins": [
