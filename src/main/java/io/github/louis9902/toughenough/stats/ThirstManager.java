@@ -9,6 +9,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 
+/**
+ * TODO:
+ * - make player not regenerate twice (hunger and thirst)
+ * - give player sprinting debuff when not enough thirst
+ * - make game rule to disable thirst
+ */
 public class ThirstManager {
 
     public static final int MAX_THIRST_LEVEL = 20;
@@ -56,7 +62,7 @@ public class ThirstManager {
     }
 
     public void update(PlayerEntity player) {
-        if (!Gameplay.ENABLE_THIRST || player.isCreative()) return;
+        if (!Gameplay.isThirstEnabled(player.world) || player.isCreative()) return;
 
         Difficulty difficulty = player.world.getDifficulty();
 
