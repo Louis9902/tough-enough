@@ -1,7 +1,7 @@
-package io.github.louis9902.toughenough.components.implementations;
+package io.github.louis9902.toughenough.components.defaults;
 
-import io.github.louis9902.toughenough.MyComponents;
-import io.github.louis9902.toughenough.components.DrinkableComponent;
+import io.github.louis9902.toughenough.ToughEnoughComponents;
+import io.github.louis9902.toughenough.components.Drinkable;
 import io.github.louis9902.toughenough.components.ThirstManager;
 import io.github.louis9902.toughenough.init.Gameplay;
 import net.minecraft.entity.Entity;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public class ThirstManagerImpl implements ThirstManager {
+public class DefaultThirstManager implements ThirstManager {
     private static final int MAX_THIRST_LEVEL = 20;
     private static final int MIN_THIRST_REGENERATION_LEVEL = 18;
     private static final float THIRST_EXHAUSTION_THRESHOLD = 4.0f;
@@ -36,13 +36,13 @@ public class ThirstManagerImpl implements ThirstManager {
     //Synced Components need to store the entity they are attached to
     final Entity provider;
 
-    public ThirstManagerImpl(Entity provider) {
+    public DefaultThirstManager(Entity provider) {
         this.provider = provider;
     }
 
     @Override
     public void drink(ItemStack item) {
-        Optional<DrinkableComponent> drink = MyComponents.DRINKABLE.maybeGet(item);
+        Optional<Drinkable> drink = ToughEnoughComponents.DRINKABLE.maybeGet(item);
         if (drink.isPresent()) {
             thirst += drink.get().getThirst();
             hydration += drink.get().getHydrationModifier();
@@ -53,11 +53,6 @@ public class ThirstManagerImpl implements ThirstManager {
 
     @Override
     public void update(PlayerEntity player) {
-        System.out.println("thirst:" + thirst);
-        System.out.println("hydration:" + hydration);
-        System.out.println("exhaustion:" + exhaustion);
-        System.out.println();
-
         if (!Gameplay.isThirstEnabled(player.world) || player.isCreative()) return;
 
         Difficulty difficulty = player.world.getDifficulty();

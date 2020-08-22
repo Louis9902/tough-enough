@@ -26,7 +26,7 @@ public interface ThirstManager extends EntitySyncedComponent {
     void update(PlayerEntity entity);
 
     /**
-     * This will get the {@link DrinkableComponent} from the ItemStack and add its values to the {@link ThirstManager}
+     * This will get the {@link Drinkable} from the ItemStack and add its values to the {@link ThirstManager}
      * appropriately. If the component is not present, the item will be ignored
      *
      * @param item The {@link ItemStack} that should be consumed
