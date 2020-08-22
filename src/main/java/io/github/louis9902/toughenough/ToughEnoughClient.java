@@ -17,7 +17,7 @@ public class ToughEnoughClient implements ClientModInitializer {
     }
 
     private static void registerModelPredicates() {
-        FabricModelPredicateProviderRegistry.register(ToughEnough.identifier("empty"), (stack, world, entity) -> CanteenItem.isDrinkable(stack) ? 0.0F : 1.0F);
+        FabricModelPredicateProviderRegistry.register(ToughEnough.identifier("empty"), (stack, world, entity) -> CanteenItem.hasFilling(stack) ? 0.0F : 1.0F);
     }
 
 }

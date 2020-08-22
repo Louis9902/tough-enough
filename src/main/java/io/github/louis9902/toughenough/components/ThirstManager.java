@@ -1,10 +1,15 @@
 package io.github.louis9902.toughenough.components;
 
+import io.github.louis9902.toughenough.components.defaults.DefaultThirstManager;
 import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
 public interface ThirstManager extends AutoSyncedComponent {
+
+    static int getMaxThirst() {
+        return DefaultThirstManager.MAX_THIRST_LEVEL;
+    }
 
     int getThirst();
 
