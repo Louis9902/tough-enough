@@ -40,6 +40,7 @@ public class DefaultHeatManager implements HeatManager {
     @Override
     public void readFromNbt(CompoundTag tag) {
         temperature = tag.getInt("temperature");
+        sync();
     }
 
     @Override

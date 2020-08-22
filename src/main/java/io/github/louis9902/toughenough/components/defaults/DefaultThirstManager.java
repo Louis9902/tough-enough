@@ -1,7 +1,5 @@
 package io.github.louis9902.toughenough.components.defaults;
 
-import io.github.louis9902.toughenough.ToughEnoughComponents;
-import io.github.louis9902.toughenough.components.Drinkable;
 import io.github.louis9902.toughenough.components.ThirstManager;
 import io.github.louis9902.toughenough.init.Gameplay;
 import net.minecraft.entity.Entity;
@@ -12,11 +10,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Optional;
 
 import static io.github.louis9902.toughenough.ToughEnoughComponents.DRINKABLE;
+import static io.github.louis9902.toughenough.ToughEnoughComponents.THIRSTY;
 
 public class DefaultThirstManager implements ThirstManager {
 
@@ -156,7 +152,6 @@ public class DefaultThirstManager implements ThirstManager {
         tag.putInt("thirst", thirst);
         tag.putFloat("hydration", hydration);
         tag.putFloat("exhaustion", exhaustion);
-        return tag;
     }
 
     //We override this so that calling sync() only transmits the thirst information to the player it
@@ -196,14 +191,12 @@ public class DefaultThirstManager implements ThirstManager {
     public void setHydration(float hydration) {
         this.hydration = hydration;
         sync();
-        hydration = h;
     }
 
     @Override
     public void setExhaustion(float exhaustion) {
         this.exhaustion = Math.min(exhaustion, MAX_EXHAUSTION_LEVEL);
         sync();
-        exhaustion = e;
     }
     //endregion
 }
