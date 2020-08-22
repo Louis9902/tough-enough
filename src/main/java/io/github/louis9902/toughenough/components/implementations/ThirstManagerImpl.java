@@ -42,10 +42,10 @@ public class ThirstManagerImpl implements ThirstManager {
 
     @Override
     public void drink(ItemStack item) {
-        Optional<DrinkableComponent> drink =  MyComponents.DRINKABLE.maybeGet(item);
-        if(drink.isPresent()){
-            thirst+=drink.get().getThirst();
-            hydration+=drink.get().getHydrationModifier();
+        Optional<DrinkableComponent> drink = MyComponents.DRINKABLE.maybeGet(item);
+        if (drink.isPresent()) {
+            thirst += drink.get().getThirst();
+            hydration += drink.get().getHydrationModifier();
             //only call sync at the end and don't use setts to save packets
             sync();
         }
@@ -58,7 +58,7 @@ public class ThirstManagerImpl implements ThirstManager {
         System.out.println("exhaustion:" + exhaustion);
         System.out.println();
 
-        if (!Gameplay.ENABLE_THIRST || player.isCreative()) return;
+        if (!Gameplay.isThirstEnabled(player.world) || player.isCreative()) return;
 
         Difficulty difficulty = player.world.getDifficulty();
 
@@ -123,7 +123,7 @@ public class ThirstManagerImpl implements ThirstManager {
     //TODO wir wollten eigentlich diese methode hier verwenden, ist die gut geignet oder sollte die logik in den settern gemacht werden
     public void add(int thirst, float hydration) {
         this.setThirst(Math.min(MAX_THIRST_LEVEL, this.thirst + thirst));
-        this.setHydration(Math.min((float)this.thirst, this.hydration + (thirst * hydration * HYDRATION_MULTIPLIER_MAGIC_CONSTANT)));
+        this.setHydration(Math.min((float) this.thirst, this.hydration + (thirst * hydration * HYDRATION_MULTIPLIER_MAGIC_CONSTANT)));
     }
 
     private static boolean canPlayerRegenerateHealth(PlayerEntity player) {
@@ -145,9 +145,9 @@ public class ThirstManagerImpl implements ThirstManager {
 
     @Override
     public @NotNull CompoundTag toTag(CompoundTag tag) {
-        tag.putInt("thirst",thirst);
-        tag.putFloat("hydration",hydration);
-        tag.putFloat("exhaustion",exhaustion);
+        tag.putInt("thirst", thirst);
+        tag.putFloat("hydration", hydration);
+        tag.putFloat("exhaustion", exhaustion);
         return tag;
     }
 

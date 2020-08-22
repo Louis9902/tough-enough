@@ -1,5 +1,6 @@
 package io.github.louis9902.toughenough;
 
+import io.github.louis9902.toughenough.client.HotBarDrawer;
 import io.github.louis9902.toughenough.item.Canteen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -9,6 +10,7 @@ import net.fabricmc.fabric.api.object.builder.v1.client.model.FabricModelPredica
 @Environment(EnvType.CLIENT)
 public class ToughEnoughClient implements ClientModInitializer {
 
+    private HotBarDrawer hotbar = new HotBarDrawer();
     @Override
     public void onInitializeClient() {
         registerModelPredicates();
