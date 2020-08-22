@@ -59,7 +59,7 @@ public abstract class PlayerEntityMixin extends Entity {
     @Inject(method = "eatFood", at = @At(
             value = "HEAD"
     ))
-    private void eatFood(CallbackInfoReturnable<ItemStack> ci, World world, ItemStack stack) {
+    private void eatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
         DRINKABLE.maybeGet(stack)
                 .flatMap(drink -> THIRSTY.maybeGet(this))
                 .ifPresent((thirsty) -> thirsty.drink(stack));

@@ -16,25 +16,46 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
+import static io.github.louis9902.toughenough.ToughEnoughComponents.DRINKABLE;
+
 public class DefaultThirstManager implements ThirstManager {
-    private static final int MAX_THIRST_LEVEL = 20;
+
+    public static final int MAX_THIRST_LEVEL = 20;
+    public static final float MAX_EXHAUSTION_LEVEL = 40.0f;
+
     private static final int MIN_THIRST_REGENERATION_LEVEL = 18;
     private static final float THIRST_EXHAUSTION_THRESHOLD = 4.0f;
     private static final float HYDRATION_MULTIPLIER_MAGIC_CONSTANT = 2.0F;
 
-    //thirst is similar to hunger, it has 20 levels
-    int thirst = 20;
-    //hydration is the amount of water that was consumed beyond the max thirst level
-    float hydration = 5;
-    //exhaustion is incremented each time the player does something that consumes thirst,
-    //when it has reached a threshold the thirst will be decreased and exhaustion will be reset
-    float exhaustion = 0;
+    /**
+     * Thirst is similar to hunger, it has 20 levels.
+     */
+    private int thirst = 20;
 
-    //This value represents the time passed since the user took the last time damage because of thirst.
+    /**
+     * Hydration is the amount of water that was consumed
+     * beyond the max thirst level.
+     */
+    private float hydration = 5;
+
+    /**
+     * Exhaustion is incremented each time the player does something that consumes thirst,
+     * when it has reached the threshold {@link DefaultThirstManager#THIRST_EXHAUSTION_THRESHOLD}
+     * the thirst will be decreased and exhaustion will be reset.
+     */
+    private float exhaustion = 0;
+
+    /**
+     * This value represents the time passed since the player
+     * took the last time damage because of thirst.
+     */
     private int counter;
 
-    //Synced Components need to store the entity they are attached to
-    final Entity provider;
+    /**
+     * {@link nerdhub.cardinal.components.api.component.extension.SyncedComponent SyncedComponent}
+     * need to store the entity they are attached to.
+     */
+    private final Entity provider;
 
     public DefaultThirstManager(Entity provider) {
         this.provider = provider;
@@ -42,13 +63,12 @@ public class DefaultThirstManager implements ThirstManager {
 
     @Override
     public void drink(ItemStack item) {
-        Optional<Drinkable> drink = ToughEnoughComponents.DRINKABLE.maybeGet(item);
-        if (drink.isPresent()) {
-            thirst += drink.get().getThirst();
-            hydration += drink.get().getHydrationModifier();
-            //only call sync at the end and don't use setts to save packets
+        DRINKABLE.maybeGet(item).ifPresent(drinkable -> {
+            thirst = Math.min(drinkable.getThirst() + getThirst(), MAX_THIRST_LEVEL);
+            hydration += drinkable.getHydrationModifier();
+            // only call sync at the end and don't use setts to save packets
             sync();
-        }
+        });
     }
 
     @Override
@@ -108,18 +128,17 @@ public class DefaultThirstManager implements ThirstManager {
                 this.counter = 0;
             }
 
-            //we call sync only once at the end to save packets
-            //data definitely changed if first if condition was true
+            // we call sync only once at the end to save packets
+            // data definitely changed if first if condition was true
             sync();
         }
 
     }
 
-    //TODO wir wollten eigentlich diese methode hier verwenden, ist die gut geignet oder sollte die logik in den settern gemacht werden
-    public void add(int thirst, float hydration) {
+/*    public void add(int thirst, float hydration) {
         this.setThirst(Math.min(MAX_THIRST_LEVEL, this.thirst + thirst));
         this.setHydration(Math.min((float) this.thirst, this.hydration + (thirst * hydration * HYDRATION_MULTIPLIER_MAGIC_CONSTANT)));
-    }
+    }*/
 
     private static boolean canPlayerRegenerateHealth(PlayerEntity player) {
         return player.getHealth() > 0.0f && player.getHealth() < player.getMaxHealth();
@@ -146,8 +165,10 @@ public class DefaultThirstManager implements ThirstManager {
         return tag;
     }
 
-    //We override this so that callling sync() only transmits the thirst information to the player it
-    //belongs to, this is to save network traffic!
+    /**
+     * We override this so that calling sync() only transmits the thirst
+     * information to the player it belongs to, this is to save network traffic!
+     */
     @Override
     public void syncWith(ServerPlayerEntity player) {
         if (player == this.provider) ThirstManager.super.syncWith(player);
@@ -170,21 +191,21 @@ public class DefaultThirstManager implements ThirstManager {
     }
 
     @Override
-    public void setThirst(int t) {
+    public void setThirst(int thirst) {
+        this.thirst = Math.min(thirst, MAX_THIRST_LEVEL);
         sync();
-        thirst = t;
     }
 
     @Override
-    public void setHydration(float h) {
+    public void setHydration(float hydration) {
+        this.hydration = hydration;
         sync();
-        hydration = h;
     }
 
     @Override
-    public void setExhaustion(float e) {
+    public void setExhaustion(float exhaustion) {
+        this.exhaustion = Math.min(exhaustion, MAX_EXHAUSTION_LEVEL);
         sync();
-        exhaustion = e;
     }
     //endregion
 }

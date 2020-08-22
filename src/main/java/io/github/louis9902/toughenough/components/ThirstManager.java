@@ -1,10 +1,15 @@
 package io.github.louis9902.toughenough.components;
 
+import io.github.louis9902.toughenough.components.defaults.DefaultThirstManager;
 import nerdhub.cardinal.components.api.util.sync.EntitySyncedComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
 public interface ThirstManager extends EntitySyncedComponent {
+
+    static int getMaxThirst() {
+        return DefaultThirstManager.MAX_THIRST_LEVEL;
+    }
 
     int getThirst();
 

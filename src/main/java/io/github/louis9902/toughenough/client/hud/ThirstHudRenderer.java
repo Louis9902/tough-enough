@@ -2,12 +2,17 @@ package io.github.louis9902.toughenough.client.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.louis9902.toughenough.ToughEnough;
+import io.github.louis9902.toughenough.components.ThirstManager;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
+
+import java.util.Random;
 
 import static io.github.louis9902.toughenough.ToughEnoughComponents.THIRSTY;
 import static io.github.louis9902.toughenough.init.ToughEnoughStatusEffects.THIRST;
@@ -17,9 +22,11 @@ public final class ThirstHudRenderer extends DrawableHelper {
     private static final Identifier STATUS_BAR_ICONS = ToughEnough.identifier("textures/gui/statusbar.png");
 
     private final MinecraftClient client;
+    private final Random random;
 
-    public ThirstHudRenderer() {
+    private ThirstHudRenderer() {
         client = MinecraftClient.getInstance();
+        random = new Random();
     }
 
     public static void register() {
@@ -29,6 +36,13 @@ public final class ThirstHudRenderer extends DrawableHelper {
 
     private void render(MatrixStack matrices, float delta) {
         if (client.options.hudHidden || !client.interactionManager.hasStatusBars()) return;
+
+        matrices.push();
+        PlayerEntity p = getCameraPlayer();
+        drawCenteredString(matrices, client.textRenderer, "Thirst: " + THIRSTY.get(p).getThirst(), 100, 100, 0);
+        drawCenteredString(matrices, client.textRenderer, "Hydration: " + THIRSTY.get(p).getHydration(), 100, 110, 0);
+        drawCenteredString(matrices, client.textRenderer, "Exhaustion: " + THIRSTY.get(p).getExhaustion(), 100, 120, 0);
+        matrices.pop();
 
         matrices.push();
         RenderSystem.enableBlend();
@@ -41,17 +55,44 @@ public final class ThirstHudRenderer extends DrawableHelper {
                 int width = client.getWindow().getScaledWidth();
                 int height = client.getWindow().getScaledHeight();
 
-                int x = width / 2 + 10;
+                int x = width / 2 + 9;
+                int y = height - 49;
 
-                int thirst = THIRSTY.get(player).getThirst();
+                int offset = player.hasStatusEffect(THIRST) ? 9 : 0;
 
-                if (player.hasStatusEffect(THIRST)) {
-                    for (int i = 0; i < 10; i++) {
-                        drawTexture(matrices, x + i * 8, height - 49, 18, 0, 9, 9);
-                    }
-                } else {
-                    for (int i = 0; i < 10; i++) {
-                        drawTexture(matrices, x + i * 8, height - 49, 0, 0, 9, 9);
+                ThirstManager manager = THIRSTY.get(player);
+                int thirst = manager.getThirst();
+                float hydration = manager.getHydration();
+
+                // drawing texture starting from the back
+                x += 72;
+
+                boolean hops = false;
+                if (hydration <= 0.0F && player.world.getTime() % (thirst * 3 + 1) == 0) {
+                    hops = true;
+                }
+
+                // drawing the full drops
+                int fullDrops = thirst / 2;
+                for (int i = 0; i < fullDrops; i++) {
+                    int yo = hops ? (y + random.nextInt(3) - 1) : y;
+                    drawTexture(matrices, x - i * 8, yo, offset, 0, 9, 9);
+                    drawTexture(matrices, x - i * 8, yo, offset + 18, 0, 9, 9);
+                }
+
+                // drawing the half drops
+                int halfDrops = thirst % 2;
+                if (halfDrops > 0) {
+                    int yo = hops ? (y + random.nextInt(3) - 1) : y;
+                    drawTexture(matrices, x - (fullDrops * 8), yo, offset, 0, 9, 9);
+                    drawTexture(matrices, x - (fullDrops * 8), yo, offset + 36, 0, 9, 9);
+                }
+
+                int drops = fullDrops + halfDrops;
+                if (drops < 10) {
+                    for (; drops < 10; drops++) {
+                        int yo = hops ? (y + random.nextInt(3) - 1) : y;
+                        drawTexture(matrices, x - (drops * 8), yo, offset, 0, 9, 9);
                     }
                 }
 
