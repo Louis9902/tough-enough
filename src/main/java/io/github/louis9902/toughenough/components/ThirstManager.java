@@ -1,8 +1,7 @@
 package io.github.louis9902.toughenough.components;
 
-import io.github.louis9902.toughenough.components.defaults.DefaultThirstManager;
 import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
-import net.minecraft.entity.player.PlayerEntity;
+import io.github.louis9902.toughenough.components.defaults.DefaultThirstManager;
 import net.minecraft.item.ItemStack;
 
 public interface ThirstManager extends AutoSyncedComponent {
@@ -25,10 +24,8 @@ public interface ThirstManager extends AutoSyncedComponent {
 
     /**
      * This will run the internal logic of the {@link ThirstManager} and should be called every tick from the Player
-     *
-     * @param entity The player the thirst logic should be updated on
      */
-    void update(PlayerEntity entity);
+    void update();
 
     /**
      * This will get the {@link Drinkable} from the ItemStack and add its values to the {@link ThirstManager}
