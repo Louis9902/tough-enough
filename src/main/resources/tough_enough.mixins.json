@@ -3,10 +3,9 @@
   "minVersion": "0.8",
   "package": "io.github.louis9902.toughenough.mixin",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [
-    "PlayerEntityMixin"
-  ],
+  "mixins": ["PlayerEntityMixin"],
   "client": [
+    "ItemRendererMixin",
     "MixinInGameHud"
   ],
   "injectors": {

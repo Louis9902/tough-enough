@@ -9,6 +9,7 @@ import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
@@ -35,7 +36,8 @@ public final class ThirstHudRenderer extends DrawableHelper {
     }
 
     private void render(MatrixStack matrices, float delta) {
-        if (client.options.hudHidden || !client.interactionManager.hasStatusBars()) return;
+        if (client.options.hudHidden || (client.interactionManager != null && !client.interactionManager.hasStatusBars()))
+            return;
 
         matrices.push();
         PlayerEntity p = getCameraPlayer();
@@ -52,15 +54,18 @@ public final class ThirstHudRenderer extends DrawableHelper {
 
             PlayerEntity player = getCameraPlayer();
             if (player != null) {
+                ThirstManager manager = THIRSTY.get(player);
+
                 int width = client.getWindow().getScaledWidth();
                 int height = client.getWindow().getScaledHeight();
+
+                // -- Thirst --
 
                 int x = width / 2 + 9;
                 int y = height - 49;
 
                 int offset = player.hasStatusEffect(THIRST) ? 9 : 0;
 
-                ThirstManager manager = THIRSTY.get(player);
                 int thirst = manager.getThirst();
                 float hydration = manager.getHydration();
 
@@ -88,6 +93,7 @@ public final class ThirstHudRenderer extends DrawableHelper {
                     drawTexture(matrices, x - (fullDrops * 8), yo, offset + 36, 0, 9, 9);
                 }
 
+                // drawing the rest of the drops shadows
                 int drops = fullDrops + halfDrops;
                 if (drops < 10) {
                     for (; drops < 10; drops++) {
@@ -95,6 +101,17 @@ public final class ThirstHudRenderer extends DrawableHelper {
                         drawTexture(matrices, x - (drops * 8), yo, offset, 0, 9, 9);
                     }
                 }
+
+                // -- Heat --
+
+                Arm arm = player.getMainArm();
+
+                // 91 offset from center - 6 padding ( - 8 texture width when arm right )
+                x = arm == Arm.RIGHT ? (width / 2 - 91 - 6 - 8) : (width / 2 + 91 + 6);
+                y = height - 19;
+
+                int head = 3;
+                drawTexture(matrices, x, y, head * 9, 10, 8, 17);
 
             }
         }

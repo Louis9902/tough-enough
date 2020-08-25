@@ -7,8 +7,8 @@ import dev.onyxstudios.cca.api.v3.component.ComponentV3;
  * Thirst is the thirst level that will be restored
  * Hydration is the amount of thirst that is saved beyond the normal thirst bar (equivalent to saturation of hunger)
  */
-public interface Drinkable extends ComponentV3 {
+public interface Drink extends ComponentV3 {
     int getThirst();
 
-    float getHydrationModifier();
+    float getHydration();
 }

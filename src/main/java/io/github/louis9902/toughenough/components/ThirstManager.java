@@ -31,12 +31,12 @@ public interface ThirstManager extends AutoSyncedComponent {
     void update(PlayerEntity entity);
 
     /**
-     * This will get the {@link Drinkable} from the ItemStack and add its values to the {@link ThirstManager}
+     * This will get the {@link Drink} from the ItemStack and add its values to the {@link ThirstManager}
      * appropriately. If the component is not present, the item will be ignored
      *
      * @param item The {@link ItemStack} that should be consumed
      */
-    void drink(ItemStack item);
+    void drink(Drink drink);
 
     default void addThirst(int t) {
         setThirst(getThirst() + t);
@@ -49,4 +49,9 @@ public interface ThirstManager extends AutoSyncedComponent {
     default void addHydration(float t) {
         setHydration(getHydration() + t);
     }
+
+    default boolean isThirsty() {
+        return getThirst() < getMaxThirst();
+    }
+
 }

@@ -1,5 +1,6 @@
 package io.github.louis9902.toughenough.components.defaults;
 
+import io.github.louis9902.toughenough.components.Drink;
 import io.github.louis9902.toughenough.components.ThirstManager;
 import io.github.louis9902.toughenough.init.Gameplay;
 import net.minecraft.entity.Entity;
@@ -57,13 +58,11 @@ public class DefaultThirstManager implements ThirstManager {
     }
 
     @Override
-    public void drink(ItemStack item) {
-        DRINKABLE.maybeGet(item).ifPresent(drinkable -> {
-            thirst = Math.min(drinkable.getThirst() + getThirst(), MAX_THIRST_LEVEL);
-            hydration += drinkable.getHydrationModifier();
-            // only call sync at the end and don't use setts to save packets
-            sync();
-        });
+    public void drink(Drink drink) {
+        thirst = Math.min(drink.getThirst() + getThirst(), MAX_THIRST_LEVEL);
+        hydration += drink.getHydration();
+        // only call sync at the end and don't use setts to save packets
+        sync();
     }
 
     @Override

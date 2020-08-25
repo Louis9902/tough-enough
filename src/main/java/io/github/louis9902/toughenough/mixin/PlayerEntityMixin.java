@@ -60,8 +60,6 @@ public abstract class PlayerEntityMixin extends Entity {
             value = "HEAD"
     ))
     private void eatFood(World world, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
-        DRINKABLE.maybeGet(stack)
-                .flatMap(drink -> THIRSTY.maybeGet(this))
-                .ifPresent((thirsty) -> thirsty.drink(stack));
+        DRINKABLE.maybeGet(stack).ifPresent(drink -> THIRSTY.maybeGet(this).ifPresent(manager -> manager.drink(drink)));
     }
 }
