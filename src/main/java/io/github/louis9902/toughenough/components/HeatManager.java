@@ -6,4 +6,6 @@ public interface HeatManager extends AutoSyncedComponent {
     int getTemperature();
 
     void setTemperature(int t);
+
+    void update();
 }

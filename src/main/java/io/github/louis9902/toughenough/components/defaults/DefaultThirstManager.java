@@ -3,7 +3,6 @@ package io.github.louis9902.toughenough.components.defaults;
 import io.github.louis9902.toughenough.components.Drink;
 import io.github.louis9902.toughenough.components.ThirstManager;
 import io.github.louis9902.toughenough.init.Gameplay;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -51,9 +50,9 @@ public class DefaultThirstManager implements ThirstManager {
      * This value represents the time passed since the player
      * took the last time damage because of thirst.
      */
-    private final Entity provider;
+    private final PlayerEntity provider;
 
-    public DefaultThirstManager(Entity provider) {
+    public DefaultThirstManager(PlayerEntity provider) {
         this.provider = provider;
     }
 
@@ -66,7 +65,8 @@ public class DefaultThirstManager implements ThirstManager {
     }
 
     @Override
-    public void update(PlayerEntity player) {
+    public void update() {
+        PlayerEntity player = provider;
         if (!Gameplay.isThirstEnabled(player.world) || player.isCreative()) return;
 
         Difficulty difficulty = player.world.getDifficulty();

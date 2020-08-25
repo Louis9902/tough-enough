@@ -1,5 +1,7 @@
 package io.github.louis9902.toughenough.mixin;
 
+import io.github.louis9902.toughenough.components.HeatManager;
+import io.github.louis9902.toughenough.components.ThirstManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.HungerManager;
@@ -13,8 +15,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static io.github.louis9902.toughenough.ToughEnoughComponents.DRINKABLE;
-import static io.github.louis9902.toughenough.ToughEnoughComponents.THIRSTY;
+import static io.github.louis9902.toughenough.ToughEnoughComponents.*;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends Entity {
@@ -32,8 +33,10 @@ public abstract class PlayerEntityMixin extends Entity {
     @Inject(method = "tick", at = @At(
             value = "HEAD"))
     public void tick(CallbackInfo ci) {
-        if (!world.isClient)
-            THIRSTY.maybeGet(this).ifPresent((val) -> val.update((PlayerEntity) (Object) this));
+        if (!world.isClient) {
+            THIRSTY.maybeGet(this).ifPresent(ThirstManager::update);
+            HEATY.maybeGet(this).ifPresent(HeatManager::update);
+        }
     }
 
     /**

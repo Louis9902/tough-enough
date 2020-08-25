@@ -26,6 +26,11 @@ public class DefaultHeatManager implements HeatManager {
         sync();
     }
 
+    @Override
+    public void update() {
+
+    }
+
     //We override this so that calling sync() only transmits the thirst information to the player it
     //belongs to, this is to save network traffic!
     @Override
