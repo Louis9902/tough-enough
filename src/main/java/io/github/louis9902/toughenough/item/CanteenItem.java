@@ -14,10 +14,12 @@ import net.minecraft.world.World;
 import static net.minecraft.sound.SoundCategory.NEUTRAL;
 import static net.minecraft.sound.SoundEvents.ITEM_BOTTLE_FILL;
 
-public class CanteenItem extends DrinkItem implements DamageBypassItem {
+public class CanteenItem extends DrinkItem {
+
+    private static final int MAX_DAMAGE = 4;
 
     public CanteenItem(Settings settings, int thirst, float hydration) {
-        super(settings.maxDamage(4), thirst, hydration);
+        super(settings.maxDamage(MAX_DAMAGE), thirst, hydration);
     }
 
     @Override
@@ -41,16 +43,29 @@ public class CanteenItem extends DrinkItem implements DamageBypassItem {
     }
 
     @Override
+    public void onCraft(ItemStack stack, World world, PlayerEntity player) {
+        stack.setDamage(3);
+    }
+
+    @Override
     protected boolean canConsume(PlayerEntity player, ItemStack stack) {
         return super.canConsume(player, stack) && hasFilling(stack);
     }
 
     @Override
     protected ItemStack consume(PlayerEntity player, ItemStack stack) {
-        // canteen shouldn't break at any point as we have a broken state
-        stack.damage(1, player, (e) -> {
-            throw new IllegalStateException("canteen shouldn't be broken");
-        });
+        int damage = stack.getDamage() + 1;
+        // 0 1 2 3 4 -- max = 4
+
+        if (damage > 0 && damage < MAX_DAMAGE) {
+            stack.setDamage(damage);
+            // canteen is empty hide damage bar
+            if (damage == 3) {
+                stack.getOrCreateTag().putBoolean("Unbreakable", true);
+            } else if (stack.getTag() != null && stack.getTag().contains("Unbreakable")) {
+                stack.getTag().remove("Unbreakable");
+            }
+        }
         return stack;
     }
 
@@ -70,18 +85,4 @@ public class CanteenItem extends DrinkItem implements DamageBypassItem {
         return stack.getDamage() < stack.getMaxDamage() - 1;
     }
 
-    @Override
-    public boolean isDamaged(ItemStack stack) {
-        return stack.isDamageable() && stack.getDamage() < getMaxDamage() - 1;
-    }
-
-    @Override
-    public int getDamage(ItemStack stack) {
-        return stack.getDamage();
-    }
-
-    @Override
-    public int getMaxDamage(ItemStack stack) {
-        return getMaxDamage() - 1;
-    }
 }

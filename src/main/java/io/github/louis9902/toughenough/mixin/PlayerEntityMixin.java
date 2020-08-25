@@ -30,8 +30,7 @@ public abstract class PlayerEntityMixin extends Entity {
      * <p>
      * If the component is not present for some reason, nothing will be done
      */
-    @Inject(method = "tick", at = @At(
-            value = "HEAD"))
+    @Inject(at = @At(value = "HEAD"), method = "tick")
     public void tick(CallbackInfo ci) {
         if (!world.isClient) {
             THIRSTY.maybeGet(this).ifPresent(ThirstManager::update);
@@ -56,7 +55,7 @@ public abstract class PlayerEntityMixin extends Entity {
     }
 
     /**
-     * Each time the player eats food, we also need to check weather the eaten food has a thirst component aswell,
+     * Each time the player eats food, we also need to check weather the eaten food has a thirst component as well,
      * if yes we need to drink it.
      */
     @Inject(method = "eatFood", at = @At(
