@@ -31,7 +31,7 @@ public interface ThirstManager extends AutoSyncedComponent {
      * This will get the {@link Drink} from the ItemStack and add its values to the {@link ThirstManager}
      * appropriately. If the component is not present, the item will be ignored
      *
-     * @param item The {@link ItemStack} that should be consumed
+     * @param drink The {@link ItemStack} that should be consumed
      */
     void drink(Drink drink);
 

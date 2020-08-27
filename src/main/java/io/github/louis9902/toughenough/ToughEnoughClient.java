@@ -1,6 +1,7 @@
 package io.github.louis9902.toughenough;
 
 import io.github.louis9902.toughenough.client.hud.ThirstHudRenderer;
+import io.github.louis9902.toughenough.client.modelpredicicates.ThermometerPredicicateProvider;
 import io.github.louis9902.toughenough.item.CanteenItem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -18,6 +19,7 @@ public class ToughEnoughClient implements ClientModInitializer {
 
     private static void registerModelPredicates() {
         FabricModelPredicateProviderRegistry.register(ToughEnough.identifier("empty"), (stack, world, entity) -> CanteenItem.hasFilling(stack) ? 0.0F : 1.0F);
+        FabricModelPredicateProviderRegistry.register(ToughEnough.identifier("temperature"), new ThermometerPredicicateProvider());
     }
 
 }

@@ -1,6 +1,5 @@
 package io.github.louis9902.toughenough.item;
 
-import io.github.louis9902.toughenough.ToughEnoughComponents;
 import io.github.louis9902.toughenough.components.Drink;
 import io.github.louis9902.toughenough.components.ThirstManager;
 import io.github.louis9902.toughenough.components.defaults.DefaultDrink;

@@ -12,7 +12,6 @@ import io.github.louis9902.toughenough.components.ThirstManager;
 import io.github.louis9902.toughenough.components.defaults.DefaultDrink;
 import io.github.louis9902.toughenough.components.defaults.DefaultHeatManager;
 import io.github.louis9902.toughenough.components.defaults.DefaultThirstManager;
-import io.github.louis9902.toughenough.init.ToughEnoughItems;
 import io.github.louis9902.toughenough.item.DrinkItem;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
 import net.minecraft.item.Items;
