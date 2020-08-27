@@ -8,13 +8,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.Text;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 
 import java.util.Random;
 
+import static io.github.louis9902.toughenough.ToughEnoughComponents.HEATY;
 import static io.github.louis9902.toughenough.ToughEnoughComponents.THIRSTY;
 import static io.github.louis9902.toughenough.init.ToughEnoughStatusEffects.THIRST;
 
@@ -44,6 +43,9 @@ public final class ThirstHudRenderer extends DrawableHelper {
         drawCenteredString(matrices, client.textRenderer, "Thirst: " + THIRSTY.get(p).getThirst(), 100, 100, 0);
         drawCenteredString(matrices, client.textRenderer, "Hydration: " + THIRSTY.get(p).getHydration(), 100, 110, 0);
         drawCenteredString(matrices, client.textRenderer, "Exhaustion: " + THIRSTY.get(p).getExhaustion(), 100, 120, 0);
+        drawCenteredString(matrices, client.textRenderer, "Temperature: " + HEATY.get(p).getTemperature(), 100, 130, 0);
+        drawCenteredString(matrices, client.textRenderer, "Target: " + HEATY.get(p).getTarget(), 100, 140, 0);
+        drawCenteredString(matrices, client.textRenderer, "Rate: " + HEATY.get(p).getRate(), 100, 150, 0);
         matrices.pop();
 
         matrices.push();

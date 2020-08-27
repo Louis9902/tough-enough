@@ -5,13 +5,12 @@ import io.github.louis9902.toughenough.components.ThirstManager;
 import io.github.louis9902.toughenough.init.Gameplay;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 
-import static io.github.louis9902.toughenough.ToughEnoughComponents.DRINKABLE;
 import static io.github.louis9902.toughenough.ToughEnoughComponents.THIRSTY;
 
 public class DefaultThirstManager implements ThirstManager {
@@ -66,6 +65,8 @@ public class DefaultThirstManager implements ThirstManager {
 
     @Override
     public void update() {
+        //no need to update values in creative or spectator mode
+        if (provider.isCreative() || provider.isSpectator()) return;
         PlayerEntity player = provider;
         if (!Gameplay.isThirstEnabled(player.world) || player.isCreative()) return;
 
@@ -138,6 +139,21 @@ public class DefaultThirstManager implements ThirstManager {
         return player.getHealth() > 0.0f && player.getHealth() < player.getMaxHealth();
     }
 
+    //We override this to avoid using NBT in network transmission to save traffic
+    @Override
+    public void writeToPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
+        buf.writeInt(thirst);
+        buf.writeFloat(hydration);
+        buf.writeFloat(exhaustion);
+    }
+
+    @Override
+    public void readFromPacket(PacketByteBuf buf) {
+        thirst = buf.readInt();
+        hydration = buf.readFloat();
+        exhaustion = buf.readFloat();
+    }
+
     @Override
     public void readFromNbt(CompoundTag tag) {
         thirst = tag.getInt("thirst");
@@ -154,10 +170,11 @@ public class DefaultThirstManager implements ThirstManager {
     }
 
     //We override this so that calling sync() only transmits the thirst information to the player it
-    //belongs to, this is to save network traffic!
+    //belongs to or to players in spectator mode.
+    //Other players do not receive the information to avoid unnecessary traffic
     @Override
     public boolean shouldSyncWith(ServerPlayerEntity player) {
-        return player == this.provider;
+        return player == this.provider || player.getCameraEntity() == provider;
     }
 
     private void sync() {
