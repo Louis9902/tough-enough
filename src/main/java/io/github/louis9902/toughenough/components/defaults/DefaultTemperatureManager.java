@@ -1,6 +1,6 @@
 package io.github.louis9902.toughenough.components.defaults;
 
-import io.github.louis9902.toughenough.components.HeatManager;
+import io.github.louis9902.toughenough.components.TemperatureManager;
 import io.github.louis9902.toughenough.temperature.TemperatureHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
@@ -11,7 +11,7 @@ import net.minecraft.util.math.MathHelper;
 import static io.github.louis9902.toughenough.ToughEnoughComponents.HEATY;
 import static io.github.louis9902.toughenough.temperature.HeatManagerConstants.*;
 
-public class DefaultHeatManager implements HeatManager {
+public class DefaultTemperatureManager implements TemperatureManager {
     private static final int UPDATE_TICK = 20;
 
     private final PlayerEntity provider;
@@ -23,7 +23,7 @@ public class DefaultHeatManager implements HeatManager {
     private int target = DEFAULT_TARGET;
     private int temperature = TEMPERATURE_EQUILIBRIUM;
 
-    public DefaultHeatManager(PlayerEntity provider) {
+    public DefaultTemperatureManager(PlayerEntity provider) {
         this.provider = provider;
     }
 

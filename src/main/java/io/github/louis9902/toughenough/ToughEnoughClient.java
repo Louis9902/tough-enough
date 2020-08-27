@@ -1,6 +1,8 @@
 package io.github.louis9902.toughenough;
 
 import io.github.louis9902.toughenough.client.hud.ThirstHudRenderer;
+import io.github.louis9902.toughenough.client.modelpredicicates.ThermometerPredicicateProvider;
+import io.github.louis9902.toughenough.init.ToughEnoughItems;
 import io.github.louis9902.toughenough.item.CanteenItem;
 import io.github.louis9902.toughenough.item.JuiceItem;
 import net.fabricmc.api.ClientModInitializer;
@@ -9,7 +11,6 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.client.model.FabricModelPredicateProviderRegistry;
 import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemStack;
 
 @Environment(EnvType.CLIENT)
 public class ToughEnoughClient implements ClientModInitializer {
