@@ -1,17 +1,17 @@
 package io.github.louis9902.toughenough.components.defaults;
 
-import io.github.louis9902.toughenough.components.HeatManager;
+import io.github.louis9902.toughenough.components.TemperatureManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import static io.github.louis9902.toughenough.ToughEnoughComponents.HEATY;
 
-public class DefaultHeatManager implements HeatManager {
+public class DefaultTemperatureManager implements TemperatureManager {
     final Entity provider;
     int temperature = 0;
 
-    public DefaultHeatManager(Entity provider) {
+    public DefaultTemperatureManager(Entity provider) {
         this.provider = provider;
     }
 

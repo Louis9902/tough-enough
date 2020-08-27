@@ -1,40 +1,49 @@
 package io.github.louis9902.toughenough.components.defaults;
 
 import io.github.louis9902.toughenough.components.Drink;
+import io.github.louis9902.toughenough.init.ToughEnoughRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 public class DefaultDrink implements Drink {
 
-    private int thirst;
-    private float hydration;
+    private final boolean persistent;
+    private Modifiers modifiers;
 
-    public DefaultDrink(int thirst, float hydration) {
-        this.thirst = thirst;
-        this.hydration = hydration;
+    public DefaultDrink(boolean persistent, Modifiers modifiers) {
+        this.modifiers = modifiers;
+        this.persistent = persistent;
     }
 
     @Override
-    public int getThirst() {
-        return thirst;
+    public @NotNull Modifiers getModifiers() {
+        return modifiers;
     }
 
     @Override
-    public float getHydration() {
-        return hydration;
+    public void setModifiers(@NotNull Modifiers modifiers) {
+        this.modifiers = modifiers;
     }
 
     @Override
-    public void readFromNbt(CompoundTag tag) {
-        thirst = tag.getInt("thirst");
-        hydration = tag.getFloat("hydration");
+    public void readFromNbt(CompoundTag compound) {
+        if (!persistent) return;
+        if (compound.contains("modifiers", 8)) {
+            String id = compound.getString("modifiers");
+            modifiers = ToughEnoughRegistries.DRINK_MODIFIERS.get(new Identifier(id));
+        }
     }
 
     @Override
-    public void writeToNbt(CompoundTag tag) {
-        tag.putInt("thirst", thirst);
-        tag.putFloat("hydration", hydration);
+    public void writeToNbt(CompoundTag compound) {
+        if (!persistent) return;
+        Identifier id = ToughEnoughRegistries.DRINK_MODIFIERS.getId(modifiers);
+        if (id != null) {
+            compound.putString("modifiers", id.toString());
+        }
     }
 
     @Override
@@ -42,17 +51,17 @@ public class DefaultDrink implements Drink {
         if (this == o) return true;
         if (!(o instanceof DefaultDrink)) return false;
         DefaultDrink that = (DefaultDrink) o;
-        return getThirst() == that.getThirst() &&
-                Float.compare(that.getHydration(), getHydration()) == 0;
+        return persistent == that.persistent &&
+                getModifiers().equals(that.getModifiers());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(thirst, hydration);
+        return Objects.hash(persistent, getModifiers());
     }
 
     @Override
     public String toString() {
-        return "DefaultDrink{thirst=" + getThirst() + ", hydration=" + getHydration() + '}';
+        return "DefaultDrink{thirst=" + getThirst() + ", hydration=" + getHydration() + ", poisonChance=" + getPoisonChance() + '}';
     }
 }

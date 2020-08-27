@@ -11,13 +11,49 @@ public class DamageSources extends DamageSource {
     }
 
     @Override
-    protected DamageSources setUnblockable() {
+    public DamageSources setProjectile() {
+        super.setProjectile();
+        return this;
+    }
+
+    @Override
+    public DamageSources setExplosive() {
+        super.setExplosive();
+        return this;
+    }
+
+    @Override
+    protected DamageSources setOutOfWorld() {
+        super.setOutOfWorld();
+        return this;
+    }
+
+    @Override
+    protected DamageSources setFire() {
+        super.setFire();
+        return this;
+    }
+
+    @Override
+    public DamageSources setScaledWithDifficulty() {
+        super.setScaledWithDifficulty();
+        return this;
+    }
+
+    @Override
+    public DamageSources setUsesMagic() {
+        super.setUsesMagic();
+        return this;
+    }
+
+    @Override
+    public DamageSources setUnblockable() {
         super.setUnblockable();
         return this;
     }
 
     @Override
-    protected DamageSources setBypassesArmor() {
+    public DamageSources setBypassesArmor() {
         super.setBypassesArmor();
         return this;
     }

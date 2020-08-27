@@ -1,11 +1,11 @@
 package io.github.louis9902.toughenough.item;
 
-import io.github.louis9902.toughenough.ToughEnoughComponents;
 import io.github.louis9902.toughenough.components.Drink;
 import io.github.louis9902.toughenough.components.ThirstManager;
-import io.github.louis9902.toughenough.components.defaults.DefaultDrink;
+import io.github.louis9902.toughenough.init.ToughEnoughStatusEffects;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -24,27 +24,27 @@ import java.util.Optional;
 import static io.github.louis9902.toughenough.ToughEnoughComponents.DRINKABLE;
 import static io.github.louis9902.toughenough.ToughEnoughComponents.THIRSTY;
 
-public class DrinkItem extends Item {
+public abstract class DrinkItem extends Item {
 
-    private final int thirst;
-    private final float hydration;
-
-    public DrinkItem(Settings settings, int thirst, float hydration) {
+    public DrinkItem(Settings settings) {
         super(settings);
-        this.thirst = thirst;
-        this.hydration = hydration;
     }
 
-    public @NotNull Drink newComponent(ItemStack stack) {
-        return new DefaultDrink(thirst, hydration);
-    }
+    @NotNull
+    public abstract Drink component(ItemStack stack);
 
     protected boolean canConsume(PlayerEntity player, ItemStack stack) {
         Optional<ThirstManager> manager = THIRSTY.maybeGet(player);
         return player.abilities.invulnerable || manager.map(ThirstManager::isThirsty).orElse(false);
     }
 
-    protected ItemStack consume(PlayerEntity player, ItemStack stack) {
+    protected void applyEffects(PlayerEntity player, Drink drink) {
+        if (player.world.random.nextFloat() < drink.getPoisonChance()) {
+            player.addStatusEffect(new StatusEffectInstance(ToughEnoughStatusEffects.THIRST, 600));
+        }
+    }
+
+    protected ItemStack onConsume(PlayerEntity player, ItemStack stack) {
         return stack;
     }
 
@@ -73,8 +73,11 @@ public class DrinkItem extends Item {
             player.incrementStat(Stats.USED.getOrCreateStat(this));
         }
         if (user instanceof PlayerEntity) {
-            THIRSTY.maybeGet(user).ifPresent(manager -> DRINKABLE.maybeGet(stack).ifPresent(manager::drink));
-            return consume(((PlayerEntity) user), stack);
+            THIRSTY.maybeGet(user).ifPresent(manager -> DRINKABLE.maybeGet(stack).ifPresent(drink -> {
+                manager.drink(drink);
+                applyEffects(((PlayerEntity) user), drink);
+            }));
+            return onConsume(((PlayerEntity) user), stack);
         }
         return stack;
     }
