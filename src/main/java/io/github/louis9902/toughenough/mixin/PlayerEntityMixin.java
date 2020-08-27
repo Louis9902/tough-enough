@@ -1,6 +1,6 @@
 package io.github.louis9902.toughenough.mixin;
 
-import io.github.louis9902.toughenough.components.HeatManager;
+import io.github.louis9902.toughenough.components.TemperatureManager;
 import io.github.louis9902.toughenough.components.ThirstManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -34,7 +34,7 @@ public abstract class PlayerEntityMixin extends Entity {
     public void tick(CallbackInfo ci) {
         if (!world.isClient) {
             THIRSTY.maybeGet(this).ifPresent(ThirstManager::update);
-            HEATY.maybeGet(this).ifPresent(HeatManager::update);
+            HEATY.maybeGet(this).ifPresent(TemperatureManager::update);
         }
     }
 

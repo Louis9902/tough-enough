@@ -13,7 +13,7 @@ public final class ToughEnoughStatusEffects {
     public static final StatusEffect THIRST;
 
     static {
-        THIRST = register("thirst", new ThirstStatusEffect(StatusEffectType.HARMFUL, 1));
+        THIRST = register("thirst", new ThirstStatusEffect(StatusEffectType.HARMFUL, 97 << 16 | 213 << 8 | 26));
     }
 
     private static <T extends StatusEffect> T register(String name, T effect) {

@@ -1,7 +1,15 @@
 package io.github.louis9902.toughenough.item;
 
+import io.github.louis9902.toughenough.components.Drink;
+import io.github.louis9902.toughenough.components.defaults.DefaultDrink;
+import io.github.louis9902.toughenough.item.drink.WaterType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.CauldronBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stat.Stats;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -10,6 +18,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.RayTraceContext;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 
 import static net.minecraft.sound.SoundCategory.NEUTRAL;
 import static net.minecraft.sound.SoundEvents.ITEM_BOTTLE_FILL;
@@ -18,8 +27,13 @@ public class CanteenItem extends DrinkItem {
 
     private static final int MAX_DAMAGE = 4;
 
-    public CanteenItem(Settings settings, int thirst, float hydration) {
-        super(settings.maxDamage(MAX_DAMAGE), thirst, hydration);
+    public CanteenItem(Settings settings) {
+        super(settings.maxDamage(MAX_DAMAGE));
+    }
+
+    @Override
+    public @NotNull Drink component(ItemStack stack) {
+        return new DefaultDrink(true, WaterType.NORMAL);
     }
 
     @Override
@@ -31,12 +45,26 @@ public class CanteenItem extends DrinkItem {
             BlockPos pos = result.getBlockPos();
 
             // player cannot modify block -> we can only drink
-            if (!world.canPlayerModifyAt(player, pos))
+            if (!world.canPlayerModifyAt(player, pos)) {
                 return super.use(world, player, hand);
+            }
 
             // player has hit water block -> fill canteen
-            if (world.getFluidState(pos).isIn(FluidTags.WATER))
+            if (world.getFluidState(pos).isIn(FluidTags.WATER)) {
                 return fillCanteen(world, player, hand, pos);
+            }
+
+            BlockState state = world.getBlockState(pos);
+            if (state.getBlock().is(Blocks.CAULDRON)) {
+                int level = state.get(CauldronBlock.LEVEL);
+                if (level > 0 && !world.isClient) {
+                    if (!player.isCreative()) {
+                        player.incrementStat(Stats.USE_CAULDRON);
+                        return fillCanteen(world, player, hand, pos);
+                    }
+                    ((CauldronBlock) state.getBlock()).setLevel(world, pos, state, level - 1);
+                }
+            }
         }
         // did not hit a block or it was not water -> definitely drink
         return super.use(world, player, hand);
@@ -53,9 +81,8 @@ public class CanteenItem extends DrinkItem {
     }
 
     @Override
-    protected ItemStack consume(PlayerEntity player, ItemStack stack) {
+    protected ItemStack onConsume(PlayerEntity player, ItemStack stack) {
         int damage = stack.getDamage() + 1;
-        // 0 1 2 3 4 -- max = 4
 
         if (damage > 0 && damage < MAX_DAMAGE) {
             stack.setDamage(damage);
@@ -70,7 +97,6 @@ public class CanteenItem extends DrinkItem {
     }
 
     public TypedActionResult<ItemStack> fillCanteen(World world, PlayerEntity player, Hand hand, BlockPos pos) {
-        System.out.println("CanteenItem.fillCanteen");
         ItemStack stack = player.getStackInHand(hand);
         if (stack.getDamage() > 0) {
             stack.setDamage(0);
