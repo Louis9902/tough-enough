@@ -1,0 +1,12 @@
+{
+  "itemGroup.tough_enough.general": "Tough Enough",
+  "item.tough_enough.canteen": "Canteen",
+  "item.tough_enough.juice_apple": "Apple Juice",
+  "item.tough_enough.juice_beetroot": "Beetroot Juice",
+  "item.tough_enough.juice_cactus": "Cactus Juice",
+  "item.tough_enough.juice_carrot": "Carrot Juice",
+  "item.tough_enough.juice_melon": "Melon Juice",
+  "item.tough_enough.juice_pumpkin": "Pumpkin Juice",
+  "item.tough_enough.juice_sweet_berry": "Sweet Berry Juice",
+  "effect.tough_enough.thirst":"Thirst"
+}

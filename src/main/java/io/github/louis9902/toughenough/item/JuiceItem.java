@@ -1,7 +1,7 @@
 package io.github.louis9902.toughenough.item;
 
-import io.github.louis9902.toughenough.components.Drink;
-import io.github.louis9902.toughenough.components.defaults.DefaultDrink;
+import io.github.louis9902.toughenough.api.thirst.Drink;
+import io.github.louis9902.toughenough.components.DefaultDrink;
 import io.github.louis9902.toughenough.item.drink.JuiceType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -28,7 +28,7 @@ public class JuiceItem extends DrinkItem {
     }
 
     @Override
-    public @NotNull Drink component(ItemStack stack) {
+    public @NotNull Drink componentToAttach(ItemStack stack) {
         return drink;
     }
 

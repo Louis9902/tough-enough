@@ -1,8 +1,8 @@
-package io.github.louis9902.toughenough.components.defaults;
+package io.github.louis9902.toughenough.components;
 
-import io.github.louis9902.toughenough.components.Drink;
-import io.github.louis9902.toughenough.components.ThirstManager;
-import io.github.louis9902.toughenough.init.Gameplay;
+import io.github.louis9902.toughenough.ToughEnoughComponents;
+import io.github.louis9902.toughenough.api.thirst.Drink;
+import io.github.louis9902.toughenough.api.thirst.ThirstManager;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
@@ -11,8 +11,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 
-import static io.github.louis9902.toughenough.ToughEnoughComponents.THIRSTY;
-
 public class DefaultThirstManager implements ThirstManager {
 
     public static final int MAX_THIRST_LEVEL = 20;
@@ -20,7 +18,6 @@ public class DefaultThirstManager implements ThirstManager {
 
     private static final int MIN_THIRST_REGENERATION_LEVEL = 18;
     private static final float THIRST_EXHAUSTION_THRESHOLD = 4.0f;
-    private static final float HYDRATION_MULTIPLIER_MAGIC_CONSTANT = 2.0F;
 
     /**
      * Thirst is similar to hunger, it has 20 levels.
@@ -79,7 +76,8 @@ public class DefaultThirstManager implements ThirstManager {
         //no need to update values in creative or spectator mode
         if (provider.isCreative() || provider.isSpectator()) return;
         PlayerEntity player = provider;
-        if (!Gameplay.isThirstEnabled(player.world) || player.isCreative()) return;
+        if (player.isCreative() || player.isSpectator())
+            return;
 
         Difficulty difficulty = player.world.getDifficulty();
 
@@ -188,7 +186,7 @@ public class DefaultThirstManager implements ThirstManager {
     }
 
     private void sync() {
-        THIRSTY.sync(provider);
+        ToughEnoughComponents.THIRST_MANAGER.sync(provider);
     }
 
     //region Getters and Setters

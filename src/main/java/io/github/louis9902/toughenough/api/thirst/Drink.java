@@ -1,4 +1,4 @@
-package io.github.louis9902.toughenough.components;
+package io.github.louis9902.toughenough.api.thirst;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentV3;
 import org.jetbrains.annotations.NotNull;
@@ -28,11 +28,11 @@ public interface Drink extends ComponentV3 {
     }
 
     interface Modifiers {
+
         int getThirst();
 
         float getHydration();
 
         float getPoisonChance();
     }
-
 }

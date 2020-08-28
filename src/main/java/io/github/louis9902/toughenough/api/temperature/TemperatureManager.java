@@ -1,7 +1,7 @@
-package io.github.louis9902.toughenough.components;
+package io.github.louis9902.toughenough.api.temperature;
 
 import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
-import io.github.louis9902.toughenough.misc.DebugMonitorView;
+import io.github.louis9902.toughenough.api.debug.DebugMonitor;
 
 public interface TemperatureManager extends AutoSyncedComponent {
     int getTarget();
@@ -16,7 +16,7 @@ public interface TemperatureManager extends AutoSyncedComponent {
 
     void setDebug(boolean value);
 
-    DebugMonitorView getTargetMonitor();
+    DebugMonitor getTargetMonitor();
 
-    DebugMonitorView getRateMonitor();
+    DebugMonitor getRateMonitor();
 }

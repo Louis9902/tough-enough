@@ -1,6 +1,6 @@
-package io.github.louis9902.toughenough.components.defaults;
+package io.github.louis9902.toughenough.components;
 
-import io.github.louis9902.toughenough.components.Drink;
+import io.github.louis9902.toughenough.api.thirst.Drink;
 import io.github.louis9902.toughenough.init.ToughEnoughRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;

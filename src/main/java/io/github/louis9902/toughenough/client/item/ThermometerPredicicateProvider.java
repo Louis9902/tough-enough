@@ -1,4 +1,4 @@
-package io.github.louis9902.toughenough.client.modelpredicicates;
+package io.github.louis9902.toughenough.client.item;
 
 import io.github.louis9902.toughenough.temperature.TemperatureHelper;
 import net.minecraft.client.item.ModelPredicateProvider;
@@ -30,7 +30,7 @@ public class ThermometerPredicicateProvider implements ModelPredicateProvider {
                 return 0.0F;
             }
             BlockPos pos = entity.getBlockPos();
-            int target = temperatureHelper.calculateBlockTarget(clientWorld, pos, null);
+            int target = temperatureHelper.calcTargetForBlock(clientWorld, pos, null);
             //Scale from [MIN_TARGET;MAX_TARGET] to [0;MIN_TARGET+MAX_TARGET] to [0;1]
             return (target - MIN_TARGET) / ((float) MAX_TARGET - MIN_TARGET);
         }

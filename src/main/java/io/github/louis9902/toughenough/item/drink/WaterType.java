@@ -1,6 +1,6 @@
 package io.github.louis9902.toughenough.item.drink;
 
-import io.github.louis9902.toughenough.components.Drink;
+import io.github.louis9902.toughenough.api.thirst.Drink;
 
 public enum WaterType implements Drink.Modifiers {
 

@@ -1,0 +1,12 @@
+{
+  "replace": "false",
+  "values": [
+    "tough_enough:juice_apple",
+    "tough_enough:juice_beetroot",
+    "tough_enough:juice_cactus",
+    "tough_enough:juice_carrot",
+    "tough_enough:juice_melon",
+    "tough_enough:juice_pumpkin",
+    "tough_enough:juice_sweet_berry"
+  ]
+}

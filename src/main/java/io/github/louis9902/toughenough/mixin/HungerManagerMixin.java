@@ -1,6 +1,7 @@
 package io.github.louis9902.toughenough.mixin;
 
-import io.github.louis9902.toughenough.components.ThirstManager;
+import io.github.louis9902.toughenough.ToughEnoughComponents;
+import io.github.louis9902.toughenough.api.thirst.ThirstManager;
 import io.github.louis9902.toughenough.entity.damage.DamageSources;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.HungerManager;
@@ -12,8 +13,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import static io.github.louis9902.toughenough.ToughEnoughComponents.THIRSTY;
 
 @Mixin(HungerManager.class)
 public abstract class HungerManagerMixin {
@@ -35,7 +34,7 @@ public abstract class HungerManagerMixin {
     }
 
     private boolean canThirstFastHeal(PlayerEntity player) {
-        ThirstManager manager = THIRSTY.maybeGet(player).orElseThrow(IllegalStateException::new);
+        ThirstManager manager = ToughEnoughComponents.THIRST_MANAGER.get(player);
         return manager.getHydration() > 0.0F && manager.getThirst() >= 20;
     }
 
@@ -44,14 +43,13 @@ public abstract class HungerManagerMixin {
     }
 
     private boolean canThirstHeal(PlayerEntity player) {
-        ThirstManager manager = THIRSTY.maybeGet(player).orElseThrow(IllegalStateException::new);
+        ThirstManager manager = ToughEnoughComponents.THIRST_MANAGER.get(player);
         return manager.getThirst() >= 18;
     }
 
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getGameRules()Lnet/minecraft/world/GameRules;"),
-            method = "update", cancellable = true)
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getGameRules()Lnet/minecraft/world/GameRules;"), method = "update", cancellable = true)
     public void update(PlayerEntity player, CallbackInfo ci) {
-        ThirstManager manager = THIRSTY.maybeGet(player).orElseThrow(IllegalStateException::new);
+        ThirstManager manager = ToughEnoughComponents.THIRST_MANAGER.get(player);
 
         Difficulty difficulty = player.world.getDifficulty();
 

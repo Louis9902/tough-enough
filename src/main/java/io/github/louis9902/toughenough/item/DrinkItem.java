@@ -1,7 +1,8 @@
 package io.github.louis9902.toughenough.item;
 
-import io.github.louis9902.toughenough.components.Drink;
-import io.github.louis9902.toughenough.components.ThirstManager;
+import io.github.louis9902.toughenough.ToughEnoughComponents;
+import io.github.louis9902.toughenough.api.thirst.Drink;
+import io.github.louis9902.toughenough.api.thirst.ThirstManager;
 import io.github.louis9902.toughenough.init.ToughEnoughStatusEffects;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.entity.LivingEntity;
@@ -19,11 +20,6 @@ import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
-
-import static io.github.louis9902.toughenough.ToughEnoughComponents.DRINKABLE;
-import static io.github.louis9902.toughenough.ToughEnoughComponents.THIRSTY;
-
 public abstract class DrinkItem extends Item {
 
     public DrinkItem(Settings settings) {
@@ -31,11 +27,11 @@ public abstract class DrinkItem extends Item {
     }
 
     @NotNull
-    public abstract Drink component(ItemStack stack);
+    public abstract Drink componentToAttach(ItemStack stack);
 
     protected boolean canConsume(PlayerEntity player, ItemStack stack) {
-        Optional<ThirstManager> manager = THIRSTY.maybeGet(player);
-        return player.abilities.invulnerable || manager.map(ThirstManager::isThirsty).orElse(false);
+        ThirstManager manager = ToughEnoughComponents.THIRST_MANAGER.get(player);
+        return player.abilities.invulnerable || manager.isThirsty();
     }
 
     protected void applyEffects(PlayerEntity player, Drink drink) {
@@ -52,17 +48,12 @@ public abstract class DrinkItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
 
-        Optional<Drink> drink = DRINKABLE.maybeGet(stack);
-        if (drink.isPresent()) {
-            if (canConsume(user, stack)) {
-                user.setCurrentHand(hand);
-                return TypedActionResult.consume(stack);
-            } else {
-                return TypedActionResult.fail(stack);
-            }
+        if (canConsume(user, stack)) {
+            user.setCurrentHand(hand);
+            return TypedActionResult.consume(stack);
         }
 
-        return TypedActionResult.pass(user.getStackInHand(hand));
+        return TypedActionResult.fail(stack);
     }
 
     @Override
@@ -72,13 +63,17 @@ public abstract class DrinkItem extends Item {
             Criteria.CONSUME_ITEM.trigger(player, stack);
             player.incrementStat(Stats.USED.getOrCreateStat(this));
         }
+
         if (user instanceof PlayerEntity) {
-            THIRSTY.maybeGet(user).ifPresent(manager -> DRINKABLE.maybeGet(stack).ifPresent(drink -> {
-                manager.drink(drink);
-                applyEffects(((PlayerEntity) user), drink);
-            }));
+            ThirstManager manager = ToughEnoughComponents.THIRST_MANAGER.get(user);
+            Drink drink = ToughEnoughComponents.DRINKABLE.get(stack);
+
+            manager.drink(drink);
+            applyEffects(((PlayerEntity) user), drink);
+
             return onConsume(((PlayerEntity) user), stack);
         }
+
         return stack;
     }
 

@@ -1,8 +1,7 @@
-package io.github.louis9902.toughenough.components.defaults;
+package io.github.louis9902.toughenough.components;
 
-import io.github.louis9902.toughenough.components.TemperatureManager;
-import io.github.louis9902.toughenough.misc.DebugMonitor;
-import io.github.louis9902.toughenough.misc.DebugMonitorView;
+import io.github.louis9902.toughenough.api.temperature.TemperatureManager;
+import io.github.louis9902.toughenough.api.debug.DebugMonitor;
 import io.github.louis9902.toughenough.temperature.TemperatureHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
@@ -10,16 +9,17 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.MathHelper;
 
-import static io.github.louis9902.toughenough.ToughEnoughComponents.HEATY;
+import static io.github.louis9902.toughenough.ToughEnoughComponents.TEMPERATURE_MANAGER;
 import static io.github.louis9902.toughenough.temperature.HeatManagerConstants.*;
 
 public class DefaultTemperatureManager implements TemperatureManager {
+
     private static final int UPDATE_TICK = 20;
 
     private final PlayerEntity provider;
+
     public final DebugMonitor targetMonitor = new DebugMonitor();
     public final DebugMonitor rateMonitor = new DebugMonitor();
-    private final TemperatureHelper temperatureHelper = new TemperatureHelper();
 
     private int ticks = 0;
     private int rateTicks = 0;
@@ -27,7 +27,8 @@ public class DefaultTemperatureManager implements TemperatureManager {
     private int rate = DEFAULT_RATE;
     private int target = DEFAULT_TARGET;
     private int temperature = TEMPERATURE_EQUILIBRIUM;
-    boolean debugOutput = true;
+
+    private boolean debugOutput = false;
 
     public DefaultTemperatureManager(PlayerEntity provider) {
         this.provider = provider;
@@ -45,8 +46,8 @@ public class DefaultTemperatureManager implements TemperatureManager {
         if (ticks == UPDATE_TICK) {
             ticks = 0;
 
-            int clampedRate = MathHelper.clamp(temperatureHelper.calculatePlayerRate(provider, rateMonitor), MIN_RATE, MAX_RATE);
-            int clampedTarget = MathHelper.clamp(temperatureHelper.calculatePlayerTarget(provider, targetMonitor), MIN_TARGET, MAX_TARGET);
+            int clampedRate = MathHelper.clamp(TemperatureHelper.calcRateForPlayer(provider, rateMonitor), MIN_RATE, MAX_RATE);
+            int clampedTarget = MathHelper.clamp(TemperatureHelper.calcTargetForPlayer(provider, targetMonitor), MIN_TARGET, MAX_TARGET);
 
             //only sync data when one of the values has changed
             if (clampedRate != rate || clampedTarget != target) {
@@ -135,12 +136,12 @@ public class DefaultTemperatureManager implements TemperatureManager {
     }
 
     @Override
-    public DebugMonitorView getTargetMonitor() {
+    public DebugMonitor getTargetMonitor() {
         return targetMonitor;
     }
 
     @Override
-    public DebugMonitorView getRateMonitor() {
+    public DebugMonitor getRateMonitor() {
         return rateMonitor;
     }
 
@@ -152,6 +153,6 @@ public class DefaultTemperatureManager implements TemperatureManager {
     }
 
     public void sync() {
-        HEATY.sync(provider);
+        TEMPERATURE_MANAGER.sync(provider);
     }
 }

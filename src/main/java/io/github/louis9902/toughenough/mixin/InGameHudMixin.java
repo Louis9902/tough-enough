@@ -1,6 +1,5 @@
 package io.github.louis9902.toughenough.mixin;
 
-import io.github.louis9902.toughenough.init.Gameplay;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.math.MatrixStack;
@@ -12,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(InGameHud.class)
-public abstract class MixinInGameHud extends DrawableHelper {
+public abstract class InGameHudMixin extends DrawableHelper {
 
     /*
      * The redirect mixins are used to redirect the texture draw calls for the air bubbles.
@@ -29,9 +28,7 @@ public abstract class MixinInGameHud extends DrawableHelper {
     protected abstract PlayerEntity getCameraPlayer();
 
     @Redirect(method = "renderStatusBars",
-            slice = @Slice(
-                    from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getMaxAir()I")
-            ),
+            slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getMaxAir()I")),
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/gui/hud/InGameHud;drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V",
@@ -39,14 +36,12 @@ public abstract class MixinInGameHud extends DrawableHelper {
             )
     )
     private void renderFullTexture(InGameHud helper, MatrixStack matrices, int x, int y, int u, int v, int width, int height) {
-        boolean enable = Gameplay.isThirstEnabled(getCameraPlayer().world);
+        boolean enable = true;  // TODO: offset if disabled
         helper.drawTexture(matrices, x, y - (enable ? 10 : 0), u, v, width, height);
     }
 
     @Redirect(method = "renderStatusBars",
-            slice = @Slice(
-                    from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getMaxAir()I")
-            ),
+            slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getMaxAir()I")),
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/gui/hud/InGameHud;drawTexture(Lnet/minecraft/client/util/math/MatrixStack;IIIIII)V",
@@ -54,7 +49,7 @@ public abstract class MixinInGameHud extends DrawableHelper {
             )
     )
     private void renderPartialTexture(InGameHud helper, MatrixStack matrices, int x, int y, int u, int v, int width, int height) {
-        boolean enable = Gameplay.isThirstEnabled(getCameraPlayer().world);
+        boolean enable = true;  // TODO: offset if disabled
         helper.drawTexture(matrices, x, y - (enable ? 10 : 0), u, v, width, height);
     }
 

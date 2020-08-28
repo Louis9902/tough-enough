@@ -1,13 +1,13 @@
 package io.github.louis9902.toughenough.init;
 
 import io.github.louis9902.toughenough.ToughEnough;
-import io.github.louis9902.toughenough.components.Drink;
+import io.github.louis9902.toughenough.api.thirst.Drink;
 import io.github.louis9902.toughenough.item.drink.WaterType;
 import net.minecraft.util.registry.Registry;
 
 import static net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder.createSimple;
 
-public class ToughEnoughRegistries {
+public final class ToughEnoughRegistries {
 
     public static final Registry<Drink.Modifiers> DRINK_MODIFIERS;
 

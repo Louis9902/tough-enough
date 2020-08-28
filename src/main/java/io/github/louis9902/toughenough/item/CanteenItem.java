@@ -1,7 +1,7 @@
 package io.github.louis9902.toughenough.item;
 
-import io.github.louis9902.toughenough.components.Drink;
-import io.github.louis9902.toughenough.components.defaults.DefaultDrink;
+import io.github.louis9902.toughenough.api.thirst.Drink;
+import io.github.louis9902.toughenough.components.DefaultDrink;
 import io.github.louis9902.toughenough.item.drink.WaterType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -9,7 +9,6 @@ import net.minecraft.block.CauldronBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stat.Stats;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.FluidTags;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -32,7 +31,7 @@ public class CanteenItem extends DrinkItem {
     }
 
     @Override
-    public @NotNull Drink component(ItemStack stack) {
+    public @NotNull Drink componentToAttach(ItemStack stack) {
         return new DefaultDrink(true, WaterType.NORMAL);
     }
 

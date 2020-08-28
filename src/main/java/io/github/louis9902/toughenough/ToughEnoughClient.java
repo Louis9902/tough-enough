@@ -1,8 +1,10 @@
 package io.github.louis9902.toughenough;
 
 import com.mojang.brigadier.Command;
+import io.github.louis9902.toughenough.client.hud.DebugHudRenderer;
+import io.github.louis9902.toughenough.client.hud.TemperatureHudRenderer;
 import io.github.louis9902.toughenough.client.hud.ThirstHudRenderer;
-import io.github.louis9902.toughenough.client.modelpredicicates.ThermometerPredicicateProvider;
+import io.github.louis9902.toughenough.client.item.ThermometerPredicicateProvider;
 import io.github.louis9902.toughenough.init.ToughEnoughItems;
 import io.github.louis9902.toughenough.item.CanteenItem;
 import io.github.louis9902.toughenough.item.JuiceItem;
@@ -17,8 +19,6 @@ import net.minecraft.item.ItemConvertible;
 
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
 import static com.mojang.brigadier.arguments.BoolArgumentType.getBool;
-import static io.github.louis9902.toughenough.ToughEnoughComponents.HEATY;
-import static io.github.louis9902.toughenough.ToughEnoughComponents.THIRSTY;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -29,7 +29,12 @@ public class ToughEnoughClient implements ClientModInitializer {
     public void onInitializeClient() {
         registerModelPredicates();
         registerColorProviders();
+
         ThirstHudRenderer.register();
+        TemperatureHudRenderer.register();
+        DebugHudRenderer.register();
+
+        // SettingsSyncListener.register();
 
         //TODO move this to a proper place sometime
         CommandRegistrationCallback.EVENT.register((dispatcher, ded) -> {
@@ -39,8 +44,8 @@ public class ToughEnoughClient implements ClientModInitializer {
                                     .executes(ctx -> {
                                         PlayerEntity player = ctx.getSource().getPlayer();
                                         boolean arg = getBool(ctx, "bool");
-                                        HEATY.get(player).setDebug(arg);
-                                        THIRSTY.get(player).setDebug(arg);
+                                        ToughEnoughComponents.THIRST_MANAGER.get(player).setDebug(arg);
+                                        ToughEnoughComponents.TEMPERATURE_MANAGER.get(player).setDebug(arg);
                                         return Command.SINGLE_SUCCESS;
                                     }))));
         });
@@ -52,7 +57,10 @@ public class ToughEnoughClient implements ClientModInitializer {
     }
 
     private static void registerColorProviders() {
-        ItemConvertible[] juices = ToughEnoughItems.JUICES.stream().map(ItemConvertible.class::cast).toArray(ItemConvertible[]::new);
+        // juice items need a color for their overlay
+        ItemConvertible[] juices = ToughEnoughItems.JUICES.stream()
+                .map(ItemConvertible.class::cast)
+                .toArray(ItemConvertible[]::new);
         ColorProviderRegistry.ITEM.register(JuiceItem::colorForStack, juices);
     }
 
