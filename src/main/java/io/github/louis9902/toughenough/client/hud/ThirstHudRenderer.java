@@ -2,6 +2,7 @@ package io.github.louis9902.toughenough.client.hud;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.louis9902.toughenough.ToughEnough;
+import io.github.louis9902.toughenough.components.TemperatureManager;
 import io.github.louis9902.toughenough.components.ThirstManager;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
@@ -11,6 +12,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Identifier;
 
+import java.util.Map;
 import java.util.Random;
 
 import static io.github.louis9902.toughenough.ToughEnoughComponents.HEATY;
@@ -20,6 +22,7 @@ import static io.github.louis9902.toughenough.init.ToughEnoughStatusEffects.THIR
 public final class ThirstHudRenderer extends DrawableHelper {
 
     private static final Identifier STATUS_BAR_ICONS = ToughEnough.identifier("textures/gui/statusbar.png");
+    private static final int FONT_COLOR = 255 << 16 | 255 << 8 | 255;
 
     private final MinecraftClient client;
     private final Random random;
@@ -39,13 +42,33 @@ public final class ThirstHudRenderer extends DrawableHelper {
             return;
 
         matrices.push();
-        PlayerEntity p = getCameraPlayer();
-        drawCenteredString(matrices, client.textRenderer, "Thirst: " + THIRSTY.get(p).getThirst(), 100, 100, 0);
-        drawCenteredString(matrices, client.textRenderer, "Hydration: " + THIRSTY.get(p).getHydration(), 100, 110, 0);
-        drawCenteredString(matrices, client.textRenderer, "Exhaustion: " + THIRSTY.get(p).getExhaustion(), 100, 120, 0);
-        drawCenteredString(matrices, client.textRenderer, "Temperature: " + HEATY.get(p).getTemperature(), 100, 130, 0);
-        drawCenteredString(matrices, client.textRenderer, "Target: " + HEATY.get(p).getTarget(), 100, 140, 0);
-        drawCenteredString(matrices, client.textRenderer, "Rate: " + HEATY.get(p).getRate(), 100, 150, 0);
+        PlayerEntity player = getCameraPlayer();
+
+        ThirstManager thirstManager = THIRSTY.get(player);
+        TemperatureManager tempManager = HEATY.get(player);
+
+        if (tempManager.getDebug()) {
+            drawStringWithShadow(matrices, client.textRenderer, "Rate: " + tempManager.getRate(), 0, 0, FONT_COLOR);
+            drawStringWithShadow(matrices, client.textRenderer, "Rate Modifiers: ", 0, 10, FONT_COLOR);
+            int counter = 0;
+            for (Map.Entry<String, String> a : tempManager.getRateMonitor()) {
+                drawStringWithShadow(matrices, client.textRenderer, a.getKey() + ": " + a.getValue(), 0, 20 + 10 * counter, FONT_COLOR);
+                counter++;
+            }
+
+            drawStringWithShadow(matrices, client.textRenderer, "Target: " + tempManager.getTarget(), 100, 0, FONT_COLOR);
+            drawStringWithShadow(matrices, client.textRenderer, "Target Modifiers: ", 100, 10, FONT_COLOR);
+            counter = 0;
+            for (Map.Entry<String, String> a : tempManager.getTargetMonitor()) {
+                drawStringWithShadow(matrices, client.textRenderer, a.getKey() + ": " + a.getValue(), 100, 20 + 10 * counter, FONT_COLOR);
+                counter++;
+            }
+        }
+        if (thirstManager.getDebug()) {
+            drawStringWithShadow(matrices, client.textRenderer, "Thirst: " + THIRSTY.get(player).getThirst(), 200, 0, FONT_COLOR);
+            drawStringWithShadow(matrices, client.textRenderer, "Hydration: " + THIRSTY.get(player).getHydration(), 200, 10, FONT_COLOR);
+            drawStringWithShadow(matrices, client.textRenderer, "Exhaustion: " + THIRSTY.get(player).getExhaustion(), 200, 20, FONT_COLOR);
+        }
         matrices.pop();
 
         matrices.push();
@@ -54,9 +77,7 @@ public final class ThirstHudRenderer extends DrawableHelper {
         {
             client.getTextureManager().bindTexture(STATUS_BAR_ICONS);
 
-            PlayerEntity player = getCameraPlayer();
             if (player != null) {
-                ThirstManager manager = THIRSTY.get(player);
 
                 int width = client.getWindow().getScaledWidth();
                 int height = client.getWindow().getScaledHeight();
@@ -68,8 +89,8 @@ public final class ThirstHudRenderer extends DrawableHelper {
 
                 int offset = player.hasStatusEffect(THIRST) ? 9 : 0;
 
-                int thirst = manager.getThirst();
-                float hydration = manager.getHydration();
+                int thirst = thirstManager.getThirst();
+                float hydration = thirstManager.getHydration();
 
                 // drawing texture starting from the back
                 x += 72;

@@ -1,6 +1,7 @@
 package io.github.louis9902.toughenough.temperature;
 
 import io.github.louis9902.toughenough.ToughEnough;
+import io.github.louis9902.toughenough.misc.DebugMonitor;
 import io.github.louis9902.toughenough.temperature.api.TemperatureModifier;
 import io.github.louis9902.toughenough.temperature.modifiers.BiomeModifier;
 import io.github.louis9902.toughenough.temperature.modifiers.BlockProximityModifier;
@@ -9,6 +10,8 @@ import io.github.louis9902.toughenough.temperature.modifiers.TimeModifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
@@ -25,15 +28,15 @@ public class TemperatureHelper {
         modifiers.add(new HealthModifier(ToughEnough.identifier("health")));
     }
 
-    public static int calculatePlayerTarget(PlayerEntity player) {
-        return modifiers.stream().mapToInt((modifier) -> modifier.applyTargetFromPlayer(player)).reduce(TEMPERATURE_EQUILIBRIUM, Integer::sum);
+    public int calculatePlayerTarget(@NotNull PlayerEntity player, @Nullable DebugMonitor monitor) {
+        return modifiers.stream().mapToInt((modifier) -> modifier.applyTargetFromPlayer(player, monitor)).reduce(TEMPERATURE_EQUILIBRIUM, Integer::sum);
     }
 
-    public static int calculateBlockTarget(World world, BlockPos pos) {
-        return modifiers.stream().filter((mod) -> !mod.isPlayerModifier()).mapToInt((mod) -> mod.applyTargetFromEnvironment(world, pos)).reduce(TEMPERATURE_EQUILIBRIUM, Integer::sum);
+    public int calculateBlockTarget(@NotNull World world, @NotNull BlockPos pos, @Nullable DebugMonitor monitor) {
+        return modifiers.stream().filter((mod) -> !mod.isPlayerModifier()).mapToInt((mod) -> mod.applyTargetFromEnvironment(world, pos, monitor)).reduce(TEMPERATURE_EQUILIBRIUM, Integer::sum);
     }
 
-    public static int calculatePlayerRate(PlayerEntity player) {
-        return modifiers.stream().mapToInt((modifier) -> modifier.applyRateFromPlayer(player)).reduce(DEFAULT_RATE, Integer::sum);
+    public int calculatePlayerRate(@NotNull PlayerEntity player, @Nullable DebugMonitor monitor) {
+        return modifiers.stream().mapToInt((modifier) -> modifier.applyRateFromPlayer(player, monitor)).reduce(DEFAULT_RATE, Integer::sum);
     }
 }

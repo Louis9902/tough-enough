@@ -1,6 +1,8 @@
 package io.github.louis9902.toughenough.components.defaults;
 
 import io.github.louis9902.toughenough.components.TemperatureManager;
+import io.github.louis9902.toughenough.misc.DebugMonitor;
+import io.github.louis9902.toughenough.misc.DebugMonitorView;
 import io.github.louis9902.toughenough.temperature.TemperatureHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
@@ -15,6 +17,9 @@ public class DefaultTemperatureManager implements TemperatureManager {
     private static final int UPDATE_TICK = 20;
 
     private final PlayerEntity provider;
+    public final DebugMonitor targetMonitor = new DebugMonitor();
+    public final DebugMonitor rateMonitor = new DebugMonitor();
+    private final TemperatureHelper temperatureHelper = new TemperatureHelper();
 
     private int ticks = 0;
     private int rateTicks = 0;
@@ -22,6 +27,7 @@ public class DefaultTemperatureManager implements TemperatureManager {
     private int rate = DEFAULT_RATE;
     private int target = DEFAULT_TARGET;
     private int temperature = TEMPERATURE_EQUILIBRIUM;
+    boolean debugOutput = true;
 
     public DefaultTemperatureManager(PlayerEntity provider) {
         this.provider = provider;
@@ -39,8 +45,8 @@ public class DefaultTemperatureManager implements TemperatureManager {
         if (ticks == UPDATE_TICK) {
             ticks = 0;
 
-            int clampedRate = MathHelper.clamp(TemperatureHelper.calculatePlayerRate(provider), MIN_RATE, MAX_RATE);
-            int clampedTarget = MathHelper.clamp(TemperatureHelper.calculatePlayerTarget(provider), MIN_TARGET, MAX_TARGET);
+            int clampedRate = MathHelper.clamp(temperatureHelper.calculatePlayerRate(provider, rateMonitor), MIN_RATE, MAX_RATE);
+            int clampedTarget = MathHelper.clamp(temperatureHelper.calculatePlayerTarget(provider, targetMonitor), MIN_TARGET, MAX_TARGET);
 
             //only sync data when one of the values has changed
             if (clampedRate != rate || clampedTarget != target) {
@@ -66,29 +72,28 @@ public class DefaultTemperatureManager implements TemperatureManager {
         if (shouldSync) sync();
     }
 
-    //We override this so that calling sync() only transmits the thirst information to the player it
-    //belongs to, this is to save network traffic!
-    @Override
-    public boolean shouldSyncWith(ServerPlayerEntity player) {
-        return player == provider || player.getCameraEntity() == provider;
-    }
-
-    public void sync() {
-        HEATY.sync(provider);
-    }
-
     @Override
     public void writeToPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
         buf.writeInt(temperature);
-        buf.writeInt(target);
-        buf.writeInt(rate);
+        buf.writeBoolean(debugOutput);
+        if (debugOutput) {
+            buf.writeInt(target);
+            buf.writeInt(rate);
+            targetMonitor.encode(buf);
+            rateMonitor.encode(buf);
+        }
     }
 
     @Override
     public void readFromPacket(PacketByteBuf buf) {
         temperature = buf.readInt();
-        target = buf.readInt();
-        rate = buf.readInt();
+        debugOutput = buf.readBoolean();
+        if (debugOutput) {
+            target = buf.readInt();
+            rate = buf.readInt();
+            targetMonitor.decode(buf);
+            rateMonitor.decode(buf);
+        }
     }
 
     @Override
@@ -116,5 +121,37 @@ public class DefaultTemperatureManager implements TemperatureManager {
     @Override
     public int getRate() {
         return rate;
+    }
+
+    @Override
+    public boolean getDebug() {
+        return debugOutput;
+    }
+
+    @Override
+    public void setDebug(boolean value) {
+        debugOutput = value;
+        sync();
+    }
+
+    @Override
+    public DebugMonitorView getTargetMonitor() {
+        return targetMonitor;
+    }
+
+    @Override
+    public DebugMonitorView getRateMonitor() {
+        return rateMonitor;
+    }
+
+    //We override this so that calling sync() only transmits the thirst information to the player it
+    //belongs to or to players spectating him, this is to save network traffic!
+    @Override
+    public boolean shouldSyncWith(ServerPlayerEntity player) {
+        return player == provider || player.getCameraEntity() == provider;
+    }
+
+    public void sync() {
+        HEATY.sync(provider);
     }
 }

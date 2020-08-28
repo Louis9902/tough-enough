@@ -51,6 +51,8 @@ public class DefaultThirstManager implements ThirstManager {
      */
     private final PlayerEntity provider;
 
+    boolean debugOutput = false;
+
     public DefaultThirstManager(PlayerEntity provider) {
         this.provider = provider;
     }
@@ -63,6 +65,15 @@ public class DefaultThirstManager implements ThirstManager {
         sync();
     }
 
+    /*    public void add(int thirst, float hydration) {
+            this.setThirst(Math.min(MAX_THIRST_LEVEL, this.thirst + thirst));
+            this.setHydration(Math.min((float) this.thirst, this.hydration + (thirst * hydration * HYDRATION_MULTIPLIER_MAGIC_CONSTANT)));
+        }*/
+    private static boolean canPlayerRegenerateHealth(PlayerEntity player) {
+        return player.getHealth() > 0.0f && player.getHealth() < player.getMaxHealth();
+    }
+
+    //Todo replenish thirst when difficulty is peaceful
     @Override
     public void update() {
         //no need to update values in creative or spectator mode
@@ -130,28 +141,26 @@ public class DefaultThirstManager implements ThirstManager {
 
     }
 
-/*    public void add(int thirst, float hydration) {
-        this.setThirst(Math.min(MAX_THIRST_LEVEL, this.thirst + thirst));
-        this.setHydration(Math.min((float) this.thirst, this.hydration + (thirst * hydration * HYDRATION_MULTIPLIER_MAGIC_CONSTANT)));
-    }*/
-
-    private static boolean canPlayerRegenerateHealth(PlayerEntity player) {
-        return player.getHealth() > 0.0f && player.getHealth() < player.getMaxHealth();
-    }
-
     //We override this to avoid using NBT in network transmission to save traffic
+
     @Override
     public void writeToPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
         buf.writeInt(thirst);
-        buf.writeFloat(hydration);
-        buf.writeFloat(exhaustion);
+        buf.writeBoolean(debugOutput);
+        if (debugOutput) {
+            buf.writeFloat(hydration);
+            buf.writeFloat(exhaustion);
+        }
     }
 
     @Override
     public void readFromPacket(PacketByteBuf buf) {
         thirst = buf.readInt();
-        hydration = buf.readFloat();
-        exhaustion = buf.readFloat();
+        debugOutput = buf.readBoolean();
+        if (debugOutput) {
+            hydration = buf.readFloat();
+            exhaustion = buf.readFloat();
+        }
     }
 
     @Override
@@ -172,6 +181,7 @@ public class DefaultThirstManager implements ThirstManager {
     //We override this so that calling sync() only transmits the thirst information to the player it
     //belongs to or to players in spectator mode.
     //Other players do not receive the information to avoid unnecessary traffic
+
     @Override
     public boolean shouldSyncWith(ServerPlayerEntity player) {
         return player == this.provider || player.getCameraEntity() == provider;
@@ -182,6 +192,7 @@ public class DefaultThirstManager implements ThirstManager {
     }
 
     //region Getters and Setters
+
     @Override
     public int getThirst() {
         return thirst;
@@ -212,6 +223,17 @@ public class DefaultThirstManager implements ThirstManager {
     @Override
     public void setExhaustion(float exhaustion) {
         this.exhaustion = Math.min(exhaustion, MAX_EXHAUSTION_LEVEL);
+        sync();
+    }
+
+    @Override
+    public boolean getDebug() {
+        return debugOutput;
+    }
+
+    @Override
+    public void setDebug(boolean value) {
+        debugOutput = value;
         sync();
     }
     //endregion

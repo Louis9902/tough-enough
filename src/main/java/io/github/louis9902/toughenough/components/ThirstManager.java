@@ -35,6 +35,10 @@ public interface ThirstManager extends AutoSyncedComponent {
      */
     void drink(Drink drink);
 
+    boolean getDebug();
+
+    void setDebug(boolean value);
+
     default void addThirst(int t) {
         setThirst(getThirst() + t);
     }

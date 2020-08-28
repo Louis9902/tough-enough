@@ -1,11 +1,13 @@
 package io.github.louis9902.toughenough.temperature.modifiers;
 
+import io.github.louis9902.toughenough.misc.DebugMonitor;
 import net.minecraft.block.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BlockProximityModifier extends DefaultTemperatureModifier {
     private static final int HEAT_RANGE_HORIZONTAL = 2;
@@ -32,7 +34,7 @@ public class BlockProximityModifier extends DefaultTemperatureModifier {
     }
 
     @Override
-    public int applyTargetFromEnvironment(@NotNull World world, @NotNull BlockPos pos) {
+    public int applyTargetFromEnvironment(@NotNull World world, @NotNull BlockPos pos, @Nullable DebugMonitor monitor) {
         BlockPos start = pos.add(HEAT_RANGE_HORIZONTAL, HEAT_RANGE_VERTICAL, HEAT_RANGE_HORIZONTAL);
         BlockPos end = pos.add(-HEAT_RANGE_HORIZONTAL, -HEAT_RANGE_VERTICAL, -HEAT_RANGE_HORIZONTAL);
 
@@ -48,7 +50,9 @@ public class BlockProximityModifier extends DefaultTemperatureModifier {
         sum = MathHelper.clamp(sum, 0, MAXIMUM_HEAT) / MAXIMUM_HEAT;
         //Scale value to be in [0;BLOCK_TARGET_SCALE]
 
-        return (int) Math.round(sum * BLOCK_TARGET_SCALE);
+        int result = (int) Math.round(sum * BLOCK_TARGET_SCALE);
+        addIfNotNull(monitor, "Block Proximity", Integer.toString(result));
+        return result;
     }
 
     @Override
