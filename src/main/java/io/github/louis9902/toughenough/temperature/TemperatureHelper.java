@@ -2,7 +2,7 @@ package io.github.louis9902.toughenough.temperature;
 
 import io.github.louis9902.toughenough.ToughEnough;
 import io.github.louis9902.toughenough.api.debug.DebugMonitor;
-import io.github.louis9902.toughenough.api.temperature.TemperatureModifier;
+import io.github.louis9902.toughenough.api.temperature.Modifier;
 import io.github.louis9902.toughenough.temperature.modifiers.BiomeModifier;
 import io.github.louis9902.toughenough.temperature.modifiers.BlockProximityModifier;
 import io.github.louis9902.toughenough.temperature.modifiers.HealthModifier;
@@ -20,19 +20,20 @@ import static io.github.louis9902.toughenough.temperature.HeatManagerConstants.T
 
 public class TemperatureHelper {
 
-    public static final ArrayList<TemperatureModifier> modifiers = new ArrayList<>();
+    public static final ArrayList<Modifier> target_modifiers = new ArrayList<>();
+    public static final ArrayList<Modifier> rate_modifiers = new ArrayList<>();
 
     static {
-        modifiers.add(new BiomeModifier(ToughEnough.identifier("biome")));
-        modifiers.add(new BlockProximityModifier(ToughEnough.identifier("block")));
-        modifiers.add(new TimeModifier(ToughEnough.identifier("time")));
-        modifiers.add(new HealthModifier(ToughEnough.identifier("health")));
+        target_modifiers.add(new BiomeModifier(ToughEnough.identifier("biome")));
+        target_modifiers.add(new BlockProximityModifier(ToughEnough.identifier("block")));
+        target_modifiers.add(new TimeModifier(ToughEnough.identifier("time")));
+        rate_modifiers.add(new HealthModifier(ToughEnough.identifier("health")));
     }
 
     public static int calcTargetForPlayer(@NotNull PlayerEntity player, @Nullable DebugMonitor monitor) {
-        return modifiers.stream()
+        return target_modifiers.stream()
                 .mapToInt((modifier) -> {
-                    int value = modifier.applyTargetFromPlayer(player);
+                    int value = modifier.calculateFromPlayer(player);
                     if (monitor != null) monitor.add(modifier.getIdentifier().getPath(), Integer.toString(value));
                     return value;
                 })
@@ -40,10 +41,10 @@ public class TemperatureHelper {
     }
 
     public static int calcTargetForBlock(@NotNull World world, @NotNull BlockPos pos, @Nullable DebugMonitor monitor) {
-        return modifiers.stream()
+        return target_modifiers.stream()
                 .filter(modifier -> !modifier.isPlayerModifier())
                 .mapToInt((modifier) -> {
-                    int value = modifier.applyTargetFromEnvironment(world, pos);
+                    int value = modifier.calculateFromEnvironment(world, pos);
                     if (monitor != null) monitor.add(modifier.getIdentifier().getPath(), Integer.toString(value));
                     return value;
                 })
@@ -51,9 +52,9 @@ public class TemperatureHelper {
     }
 
     public static int calcRateForPlayer(@NotNull PlayerEntity player, @Nullable DebugMonitor monitor) {
-        return modifiers.stream()
+        return rate_modifiers.stream()
                 .mapToInt((modifier) -> {
-                    int value = modifier.applyRateFromPlayer(player);
+                    int value = modifier.calculateFromPlayer(player);
                     if (monitor != null) monitor.add(modifier.getIdentifier().getPath(), Integer.toString(value));
                     return value;
                 })

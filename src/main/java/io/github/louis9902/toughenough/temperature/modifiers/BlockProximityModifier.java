@@ -1,6 +1,6 @@
 package io.github.louis9902.toughenough.temperature.modifiers;
 
-import io.github.louis9902.toughenough.api.temperature.TemperatureModifier;
+import io.github.louis9902.toughenough.api.temperature.Modifier;
 import net.minecraft.block.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -8,7 +8,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
-public class BlockProximityModifier extends TemperatureModifier {
+public class BlockProximityModifier extends Modifier {
     private static final int HEAT_RANGE_HORIZONTAL = 2;
     private static final int HEAT_RANGE_VERTICAL = 1;
     private static final int MAXIMUM_HEAT = 16;
@@ -33,7 +33,7 @@ public class BlockProximityModifier extends TemperatureModifier {
     }
 
     @Override
-    public int applyTargetFromEnvironment(@NotNull World world, @NotNull BlockPos pos) {
+    public int calculateFromEnvironment(@NotNull World world, @NotNull BlockPos pos) {
         BlockPos start = pos.add(HEAT_RANGE_HORIZONTAL, HEAT_RANGE_VERTICAL, HEAT_RANGE_HORIZONTAL);
         BlockPos end = pos.add(-HEAT_RANGE_HORIZONTAL, -HEAT_RANGE_VERTICAL, -HEAT_RANGE_HORIZONTAL);
 

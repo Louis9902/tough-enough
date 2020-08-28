@@ -1,12 +1,12 @@
 package io.github.louis9902.toughenough.temperature.modifiers;
 
-import io.github.louis9902.toughenough.api.temperature.TemperatureModifier;
+import io.github.louis9902.toughenough.api.temperature.Modifier;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
-public class TimeModifier extends TemperatureModifier {
+public class TimeModifier extends Modifier {
 
     private final static int TIME_TARGET_SCALE = 2;
 
@@ -15,7 +15,7 @@ public class TimeModifier extends TemperatureModifier {
     }
 
     @Override
-    public int applyTargetFromEnvironment(@NotNull World world, @NotNull BlockPos pos) {
+    public int calculateFromEnvironment(@NotNull World world, @NotNull BlockPos pos) {
         long time = world.getTimeOfDay();
         //Scale time of day to temperature between -1 and 1
         //by modifying sin so that period is 24000 (length of one minecraft day)
