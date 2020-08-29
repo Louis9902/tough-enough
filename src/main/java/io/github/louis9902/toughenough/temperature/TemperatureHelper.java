@@ -18,44 +18,47 @@ import java.util.ArrayList;
 import static io.github.louis9902.toughenough.temperature.HeatManagerConstants.DEFAULT_RATE;
 import static io.github.louis9902.toughenough.temperature.HeatManagerConstants.TEMPERATURE_EQUILIBRIUM;
 
-public class TemperatureHelper {
+public final class TemperatureHelper {
 
-    public static final ArrayList<Modifier> target_modifiers = new ArrayList<>();
-    public static final ArrayList<Modifier> rate_modifiers = new ArrayList<>();
+    public static final ArrayList<Modifier> MODIFIERS_TARGET = new ArrayList<>();
+    public static final ArrayList<Modifier> MODIFIERS_RATE = new ArrayList<>();
 
     static {
-        target_modifiers.add(new BiomeModifier(ToughEnough.identifier("biome")));
-        target_modifiers.add(new BlockProximityModifier(ToughEnough.identifier("block")));
-        target_modifiers.add(new TimeModifier(ToughEnough.identifier("time")));
-        rate_modifiers.add(new HealthModifier(ToughEnough.identifier("health")));
+        MODIFIERS_TARGET.add(new BiomeModifier(ToughEnough.identifier("biome")));
+        MODIFIERS_TARGET.add(new BlockProximityModifier(ToughEnough.identifier("block")));
+        MODIFIERS_TARGET.add(new TimeModifier(ToughEnough.identifier("time")));
+        MODIFIERS_RATE.add(new HealthModifier(ToughEnough.identifier("health")));
     }
 
     public static int calcTargetForPlayer(@NotNull PlayerEntity player, @Nullable DebugMonitor monitor) {
-        return target_modifiers.stream()
+        return MODIFIERS_TARGET.stream()
                 .mapToInt((modifier) -> {
                     int value = modifier.calculateFromPlayer(player);
-                    if (monitor != null) monitor.add(modifier.getIdentifier().getPath(), Integer.toString(value));
+                    if (monitor != null && value > 0)
+                        monitor.add(modifier.getIdentifier().getPath(), Integer.toString(value));
                     return value;
                 })
                 .reduce(TEMPERATURE_EQUILIBRIUM, Integer::sum);
     }
 
     public static int calcTargetForBlock(@NotNull World world, @NotNull BlockPos pos, @Nullable DebugMonitor monitor) {
-        return target_modifiers.stream()
+        return MODIFIERS_TARGET.stream()
                 .filter(modifier -> !modifier.isPlayerModifier())
                 .mapToInt((modifier) -> {
                     int value = modifier.calculateFromEnvironment(world, pos);
-                    if (monitor != null) monitor.add(modifier.getIdentifier().getPath(), Integer.toString(value));
+                    if (monitor != null && value > 0)
+                        monitor.add(modifier.getIdentifier().getPath(), Integer.toString(value));
                     return value;
                 })
                 .reduce(TEMPERATURE_EQUILIBRIUM, Integer::sum);
     }
 
     public static int calcRateForPlayer(@NotNull PlayerEntity player, @Nullable DebugMonitor monitor) {
-        return rate_modifiers.stream()
+        return MODIFIERS_RATE.stream()
                 .mapToInt((modifier) -> {
                     int value = modifier.calculateFromPlayer(player);
-                    if (monitor != null) monitor.add(modifier.getIdentifier().getPath(), Integer.toString(value));
+                    if (monitor != null && value > 0)
+                        monitor.add(modifier.getIdentifier().getPath(), Integer.toString(value));
                     return value;
                 })
                 .reduce(DEFAULT_RATE, Integer::sum);

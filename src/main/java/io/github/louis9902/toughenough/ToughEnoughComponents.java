@@ -12,7 +12,11 @@ import io.github.louis9902.toughenough.api.thirst.ThirstManager;
 import io.github.louis9902.toughenough.components.DefaultTemperatureManager;
 import io.github.louis9902.toughenough.components.DefaultThirstManager;
 import io.github.louis9902.toughenough.item.DrinkItem;
+import io.github.louis9902.toughenough.thirst.ThirstCompat;
 import nerdhub.cardinal.components.api.util.RespawnCopyStrategy;
+import net.minecraft.util.Identifier;
+
+import java.util.Map;
 
 import static io.github.louis9902.toughenough.ToughEnough.identifier;
 
@@ -39,5 +43,8 @@ public class ToughEnoughComponents implements ItemComponentInitializer, EntityCo
     @Override
     public void registerItemComponentFactories(ItemComponentFactoryRegistry registry) {
         registry.registerFor(DrinkItem.class::isInstance, DRINKABLE, (item, stack) -> ((DrinkItem) item).componentToAttach(stack));
+        for (Map.Entry<Identifier, Drink> entry : ThirstCompat.DRINKS.entrySet()) {
+            registry.registerFor(entry.getKey(), DRINKABLE, (item, stack) -> entry.getValue());
+        }
     }
 }

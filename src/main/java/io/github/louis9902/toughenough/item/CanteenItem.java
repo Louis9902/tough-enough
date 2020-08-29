@@ -54,14 +54,17 @@ public class CanteenItem extends DrinkItem {
             }
 
             BlockState state = world.getBlockState(pos);
+
             if (state.getBlock().is(Blocks.CAULDRON)) {
+                ItemStack stack = player.getStackInHand(hand);
                 int level = state.get(CauldronBlock.LEVEL);
-                if (level > 0 && !world.isClient) {
+
+                if (stack.getDamage() > 0 && level > 0 && !world.isClient) {
                     if (!player.isCreative()) {
                         player.incrementStat(Stats.USE_CAULDRON);
-                        return fillCanteen(world, player, hand, pos);
+                        ((CauldronBlock) state.getBlock()).setLevel(world, pos, state, level - 1);
                     }
-                    ((CauldronBlock) state.getBlock()).setLevel(world, pos, state, level - 1);
+                    return fillCanteen(world, player, hand, pos);
                 }
             }
         }

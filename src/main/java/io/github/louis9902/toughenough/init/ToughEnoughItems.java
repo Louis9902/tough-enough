@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import io.github.louis9902.toughenough.ToughEnough;
 import io.github.louis9902.toughenough.item.CanteenItem;
 import io.github.louis9902.toughenough.item.JuiceItem;
-import io.github.louis9902.toughenough.item.ThermometerItem;
 import io.github.louis9902.toughenough.item.drink.JuiceType;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.minecraft.item.Item;
@@ -19,7 +18,6 @@ public final class ToughEnoughItems {
     public static final ItemGroup GROUP;
 
     public static final CanteenItem CANTEEN;
-    public static final ThermometerItem THERMOMETER;
 
     public static final JuiceItem APPLE_JUICE;
     public static final JuiceItem BEETROOT_JUICE;
@@ -29,11 +27,15 @@ public final class ToughEnoughItems {
     public static final JuiceItem MELON_JUICE;
     public static final JuiceItem PUMPKIN_JUICE;
 
+    public static final Item THERMOMETER;
+    public static final Item FILTER;
+
     public static final ImmutableList<JuiceItem> JUICES;
 
     static {
         CANTEEN = register("canteen", new CanteenItem(newSettings()));
-        THERMOMETER = register("thermometer", new ThermometerItem(newSettings()));
+
+        GROUP = FabricItemGroupBuilder.build(ToughEnough.identifier("general"), () -> new ItemStack(CANTEEN));
 
         JUICES = ImmutableList.of(
                 (APPLE_JUICE = register("juice_apple", new JuiceItem(newSettings(), JuiceType.APPLE))),
@@ -45,7 +47,8 @@ public final class ToughEnoughItems {
                 (SWEET_BERRY_JUICE = register("juice_sweet_berry", new JuiceItem(newSettings(), JuiceType.SWEET_BERRY)))
         );
 
-        GROUP = FabricItemGroupBuilder.build(ToughEnough.identifier("general"), () -> new ItemStack(CANTEEN));
+        THERMOMETER = register("thermometer", new Item(newSettings()));
+        FILTER = register("filter", new Item(newSettings()));
     }
 
     private static Item.Settings newSettings() {
