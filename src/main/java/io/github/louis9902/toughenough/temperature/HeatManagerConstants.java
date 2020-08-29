@@ -11,5 +11,5 @@ public final class HeatManagerConstants {
     //2400 ticks is 2 minutes
     public static final int MAX_RATE = 2400;
     //600 ticks is 30 seconds
-    public static final int DEFAULT_RATE = 600;
+    public static final int DEFAULT_RATE = 200;
 }

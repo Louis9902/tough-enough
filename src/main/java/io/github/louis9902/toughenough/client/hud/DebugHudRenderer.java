@@ -49,10 +49,11 @@ public final class DebugHudRenderer extends DrawableHelper {
                 }
 
                 drawStringWithShadow(matrices, client.textRenderer, "Target: " + managerHeat.getTarget(), 100, 0, FONT_COLOR);
-                drawStringWithShadow(matrices, client.textRenderer, "Target Modifiers: ", 100, 10, FONT_COLOR);
+                drawStringWithShadow(matrices, client.textRenderer, "Temperature: " + managerHeat.getTemperature(), 100, 10, FONT_COLOR);
+                drawStringWithShadow(matrices, client.textRenderer, "Target Modifiers: ", 100, 20, FONT_COLOR);
                 counter = 0;
                 for (Map.Entry<String, String> a : managerHeat.getTargetMonitor()) {
-                    drawStringWithShadow(matrices, client.textRenderer, a.getKey() + ": " + a.getValue(), 100, 20 + 10 * counter, FONT_COLOR);
+                    drawStringWithShadow(matrices, client.textRenderer, a.getKey() + ": " + a.getValue(), 100, 30 + 10 * counter, FONT_COLOR);
                     counter++;
                 }
             }
