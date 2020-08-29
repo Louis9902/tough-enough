@@ -4,13 +4,13 @@ import io.github.louis9902.toughenough.api.thirst.Drink;
 
 public enum JuiceType implements Drink.Modifiers {
 
-    APPLE(5, .8f, 254, 181, 0),
-    BEETROOT(5, .8f, 81, 17, 15),
-    CACTUS(5, .8f, 189, 214, 156),
-    CARROT(0, 0, 241, 120, 23),
-    MELON(0, 0, 255, 150, 128),
-    PUMPKIN(0, 0, 233, 103, 39),
-    SWEET_BERRY(5, .8f, 176, 46, 38);
+    APPLE(8, 0.8f, 254, 181, 0),
+    BEETROOT(10, 0.8f, 81, 17, 15),
+    CACTUS(6, 0.2f, 189, 214, 156),
+    CARROT(8, 0.6f, 241, 120, 23),
+    MELON(8, 0.5f, 255, 150, 128),
+    PUMPKIN(7, 0.7f, 233, 103, 39),
+    SWEET_BERRY(6, 0.7f, 176, 46, 38);
 
     private final int thirst;
     private final float hydration;

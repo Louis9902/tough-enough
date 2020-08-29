@@ -1,134 +1,134 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "tough_enough:items/thermometer_00"
+    "layer0": "tough_enough:items/thermometer/thermometer_00"
   },
   "overrides": [
     {
       "predicate": {
         "tough_enough:temperature": 0.0
       },
-      "model": "tough_enough:item/thermometer_00"
+      "model": "tough_enough:item/thermometer/thermometer_00"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.05
       },
-      "model": "tough_enough:item/thermometer_01"
+      "model": "tough_enough:item/thermometer/thermometer_01"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.10
       },
-      "model": "tough_enough:item/thermometer_02"
+      "model": "tough_enough:item/thermometer/thermometer_02"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.15
       },
-      "model": "tough_enough:item/thermometer_03"
+      "model": "tough_enough:item/thermometer/thermometer_03"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.20
       },
-      "model": "tough_enough:item/thermometer_04"
+      "model": "tough_enough:item/thermometer/thermometer_04"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.25
       },
-      "model": "tough_enough:item/thermometer_05"
+      "model": "tough_enough:item/thermometer/thermometer_05"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.30
       },
-      "model": "tough_enough:item/thermometer_06"
+      "model": "tough_enough:item/thermometer/thermometer_06"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.35
       },
-      "model": "tough_enough:item/thermometer_07"
+      "model": "tough_enough:item/thermometer/thermometer_07"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.40
       },
-      "model": "tough_enough:item/thermometer_08"
+      "model": "tough_enough:item/thermometer/thermometer_08"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.45
       },
-      "model": "tough_enough:item/thermometer_09"
+      "model": "tough_enough:item/thermometer/thermometer_09"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.50
       },
-      "model": "tough_enough:item/thermometer_10"
+      "model": "tough_enough:item/thermometer/thermometer_10"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.55
       },
-      "model": "tough_enough:item/thermometer_11"
+      "model": "tough_enough:item/thermometer/thermometer_11"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.60
       },
-      "model": "tough_enough:item/thermometer_12"
+      "model": "tough_enough:item/thermometer/thermometer_12"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.65
       },
-      "model": "tough_enough:item/thermometer_13"
+      "model": "tough_enough:item/thermometer/thermometer_13"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.70
       },
-      "model": "tough_enough:item/thermometer_14"
+      "model": "tough_enough:item/thermometer/thermometer_14"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.75
       },
-      "model": "tough_enough:item/thermometer_15"
+      "model": "tough_enough:item/thermometer/thermometer_15"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.80
       },
-      "model": "tough_enough:item/thermometer_16"
+      "model": "tough_enough:item/thermometer/thermometer_16"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.85
       },
-      "model": "tough_enough:item/thermometer_17"
+      "model": "tough_enough:item/thermometer/thermometer_17"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.90
       },
-      "model": "tough_enough:item/thermometer_18"
+      "model": "tough_enough:item/thermometer/thermometer_18"
     },
     {
       "predicate": {
         "tough_enough:temperature": 0.95
       },
-      "model": "tough_enough:item/thermometer_19"
+      "model": "tough_enough:item/thermometer/thermometer_19"
     },
     {
       "predicate": {
         "tough_enough:temperature": 1
       },
-      "model": "tough_enough:item/thermometer_20"
+      "model": "tough_enough:item/thermometer/thermometer_20"
     }
   ]
 }

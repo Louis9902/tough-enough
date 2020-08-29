@@ -1,6 +1,7 @@
 package io.github.louis9902.toughenough.temperature;
 
 public final class HeatManagerConstants {
+
     public static final int MIN_TARGET = -10;
     public static final int MAX_TARGET = 10;
     public static final int DEFAULT_TARGET = 0;

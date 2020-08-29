@@ -15,11 +15,12 @@ import static io.github.louis9902.toughenough.temperature.HeatManagerConstants.M
 import static io.github.louis9902.toughenough.temperature.HeatManagerConstants.MIN_TARGET;
 
 public final class TemperatureHudRenderer extends DrawableHelper {
-    //The functions for modelling our color transitions in relation to current heat
-    static DoubleUnaryOperator coldRed = linearFunc(0, 0, 0.5f, 1f);
-    static DoubleUnaryOperator coldGreen = linearFunc(0, 0.5f, 0.5f, 1);
-    static DoubleUnaryOperator hotGreen = linearFunc(0.5f, 1, 1, 0.5f);
-    static DoubleUnaryOperator hotBlue = linearFunc(0.5f, 1, 1, 0);
+
+    // The functions for modelling our color transitions in relation to current heat
+    private static final DoubleUnaryOperator COLOR_FUNC_COLD_RED = funcLinear(0, 0, 0.5f, 1f);
+    private static final DoubleUnaryOperator COLOR_FUNC_COLD_GREEN = funcLinear(0, 0.5f, 0.5f, 1);
+    private static final DoubleUnaryOperator COLOR_FUNC_HOT_GREEN = funcLinear(0.5f, 1, 1, 0.5f);
+    private static final DoubleUnaryOperator COLOR_FUNC_HIT_BLUE = funcLinear(0.5f, 1, 1, 0);
 
     private final MinecraftClient client;
 
@@ -32,8 +33,12 @@ public final class TemperatureHudRenderer extends DrawableHelper {
         HudRenderCallback.EVENT.register(renderer::render);
     }
 
-    //returns linear function going trough two points
-    private static DoubleUnaryOperator linearFunc(float x1, float y1, float x2, float y2) {
+    /**
+     * Calculate a function going through two points for color calculations.
+     *
+     * @return a linear function going trough two points
+     */
+    private static DoubleUnaryOperator funcLinear(float x1, float y1, float x2, float y2) {
         if (x1 == x2) return (x) -> (y1);
         return x -> ((y2 - y1) / (x2 - x1)) * (x - x1) + y1;
     }
@@ -52,26 +57,29 @@ public final class TemperatureHudRenderer extends DrawableHelper {
             int height = client.getWindow().getScaledHeight();
 
             int x = width / 2 - 8;
-            int y = height - 48;
+            int y = height - 53;
 
             PlayerEntity player = HudRenderHelper.getCameraPlayer();
             if (player != null) {
-                TemperatureManager heatMan = TEMPERATURE_MANAGER.get(player);
-                float heatPerc = (heatMan.getTemperature() - MIN_TARGET) / (float) (MAX_TARGET - MIN_TARGET);
+                TemperatureManager manager = TEMPERATURE_MANAGER.get(player);
+                float heat = (manager.getTemperature() - MIN_TARGET) / (float) (MAX_TARGET - MIN_TARGET);
+
                 int xoff = 1;
 
-                if (heatPerc >= 0.5) {
-                    //choose flame texture
-                    if (heatPerc > 0.90) {
+                if (heat >= 0.5) {
+                    // choose flame texture
+                    if (heat > 0.90) {
                         xoff += 17;
-                    } else
-                        RenderSystem.color3f(1, (float) hotGreen.applyAsDouble(heatPerc), (float) hotBlue.applyAsDouble(heatPerc));
+                    } else {
+                        RenderSystem.color3f(1, (float) COLOR_FUNC_HOT_GREEN.applyAsDouble(heat), (float) COLOR_FUNC_HIT_BLUE.applyAsDouble(heat));
+                    }
                 } else {
-                    //choose snowflake texture
-                    if (heatPerc < 0.10) {
+                    // choose snowflake texture
+                    if (heat < 0.10) {
                         xoff += 17 * 2;
-                    } else
-                        RenderSystem.color3f((float) coldRed.applyAsDouble(heatPerc), (float) coldGreen.applyAsDouble(heatPerc), 1);
+                    } else {
+                        RenderSystem.color3f((float) COLOR_FUNC_COLD_RED.applyAsDouble(heat), (float) COLOR_FUNC_COLD_GREEN.applyAsDouble(heat), 1);
+                    }
                 }
 
                 drawTexture(matrices, x, y, xoff, 11, 17, 17);
