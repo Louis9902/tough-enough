@@ -89,6 +89,9 @@ public class ToughEnough implements ModInitializer {
         ToughEnoughStatusEffects.register();
         ToughEnoughTags.register();
         ToughEnoughFluids.register();
+        ToughEnoughBlockEntities.register();
+        ToughEnoughScreenHandlers.register();
+        ToughEnoughBlocks.register();
 
         setupFluidRendering(ToughEnoughFluids.STILL_PURIFIED_WATER, ToughEnoughFluids.FLOWING_PURIFIED_WATER, new Identifier("minecraft", "water"), 255 << 16);
         BlockRenderLayerMap.INSTANCE.putFluids(RenderLayer.getTranslucent(), ToughEnoughFluids.STILL_PURIFIED_WATER, ToughEnoughFluids.FLOWING_PURIFIED_WATER);

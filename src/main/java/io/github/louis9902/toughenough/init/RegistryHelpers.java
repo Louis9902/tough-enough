@@ -2,6 +2,9 @@ package io.github.louis9902.toughenough.init;
 
 import io.github.louis9902.toughenough.ToughEnough;
 import net.minecraft.block.Block;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.BlockEntityType.Builder;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -24,6 +27,10 @@ public class RegistryHelpers {
 
     static <T extends Block> T register(String name, T effect) {
         return Registry.register(BLOCK, ToughEnough.identifier(name), effect);
+    }
+
+    static <T extends BlockEntity> BlockEntityType<T> register(String name, Builder<T> builder) {
+        return Registry.register(Registry.BLOCK_ENTITY_TYPE, ToughEnough.identifier(name), builder.build(null));
     }
 
 }

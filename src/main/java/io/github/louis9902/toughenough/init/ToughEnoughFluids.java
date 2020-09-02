@@ -22,7 +22,6 @@ public class ToughEnoughFluids {
         PURIFIED_WATER_BUCKET = RegistryHelpers.register("purified_bucket", new BucketItem(STILL_PURIFIED_WATER, new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1)));
         PURIFIED_WATER_BLOCK = RegistryHelpers.register("purified_block", new FluidBlock(STILL_PURIFIED_WATER, FabricBlockSettings.copyOf(Blocks.WATER)) {
         });
-
     }
 
     public static void register() {
