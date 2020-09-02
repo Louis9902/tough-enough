@@ -9,7 +9,7 @@ public class ToughEnoughBlocks {
     public static final Block CLIMATIZER;
 
     static {
-        CLIMATIZER = RegistryHelpers.register("climatizer", new Climatizer(FabricBlockSettings.copyOf(Blocks.DIRT)));
+        CLIMATIZER = RegistryHelpers.register("climatizer", new Climatizer(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)));
     }
 
     public static void register() {
