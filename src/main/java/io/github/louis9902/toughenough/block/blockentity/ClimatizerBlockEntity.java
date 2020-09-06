@@ -1,21 +1,31 @@
 package io.github.louis9902.toughenough.block.blockentity;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import io.github.louis9902.toughenough.block.ClimatizerBlock;
 import io.github.louis9902.toughenough.block.misc.FuckYouInv;
 import io.github.louis9902.toughenough.init.ToughEnoughBlockEntities;
 import io.github.louis9902.toughenough.init.ToughEnoughItems;
 import io.github.louis9902.toughenough.screenhandler.ClimatizerScreenHandler;
+import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.entity.AreaEffectCloudEntity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Pair;
@@ -24,33 +34,39 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 
 // TODO: consider sidedInventory for this
 public class ClimatizerBlockEntity extends LockableContainerBlockEntity implements Tickable, FuckYouInv, NamedScreenHandlerFactory {
 
     private static final HashMap<Item, Pair<Integer, FuelType>> FUEL_ITEMS = new HashMap<>();
-    private static final int MAX_SPREAD = 10;
-    private final Set<BlockPos> obstructed;
+    //private static final ClimatizerFuelRegistry MAP = null;
 
     static {
         FUEL_ITEMS.put(ToughEnoughItems.ICE_SHARD, new Pair<>(400, FuelType.COOLING));
         FUEL_ITEMS.put(ToughEnoughItems.MAGMA_SHARD, new Pair<>(400, FuelType.HEATING));
     }
 
+    private static final int TICK_COOLDOWN = 20;
+
+    private static final int MAX_EFFECT_STRENGTH = 10;
     private static final int INVENTORY_SIZE = 1;
-    private final Set<BlockPos>[] filled;
+
+    // obstruct are blocks which obstruct a block space
+    private final Set<BlockPos> obstruct;
+    // effect are blocks which are affected by the climatizer
+    private final Multimap<Integer, BlockPos> effects;
 
     private final DefaultedList<ItemStack> inventory;
     private final PropertyDelegate properties;
 
-    private int remainingBurnTime;
-    private int itemTotalBurnTime;
-    private boolean firstUpdate = true;
+    private int leftoverBurnTime;
+    private int absoluteBurnTime;
+    private int cooldown = 0;
 
     private ClimatizerBlock.Action action = ClimatizerBlock.Action.OFF;
 
@@ -59,11 +75,8 @@ public class ClimatizerBlockEntity extends LockableContainerBlockEntity implemen
         inventory = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
         properties = new Properties();
 
-        obstructed = new HashSet<>();
-        filled = new Set[MAX_SPREAD + 1];
-        for (int i = 0; i < MAX_SPREAD + 1; i++) {
-            filled[i] = new HashSet<>();
-        }
+        obstruct = new HashSet<>();
+        effects = Multimaps.newSetMultimap(new HashMap<>(), HashSet::new);
     }
 
     private enum FuelType {HEATING, COOLING}
@@ -77,9 +90,9 @@ public class ClimatizerBlockEntity extends LockableContainerBlockEntity implemen
         public int get(int index) {
             switch (index) {
                 case INDEX_REMAINING_BURN_TIME:
-                    return remainingBurnTime;
+                    return leftoverBurnTime;
                 case INDEX_TOTAL_BURN_TIME:
-                    return itemTotalBurnTime;
+                    return absoluteBurnTime;
                 case INDEX_ACTION:
                     return getCachedState().get(ClimatizerBlock.ACTION).ordinal();
             }
@@ -90,9 +103,9 @@ public class ClimatizerBlockEntity extends LockableContainerBlockEntity implemen
         public void set(int index, int value) {
             switch (index) {
                 case INDEX_REMAINING_BURN_TIME:
-                    remainingBurnTime = value;
+                    leftoverBurnTime = value;
                 case INDEX_TOTAL_BURN_TIME:
-                    itemTotalBurnTime = value;
+                    absoluteBurnTime = value;
                 case INDEX_ACTION:
                     action = ClimatizerBlock.Action.values()[action.ordinal()];
             }
@@ -106,69 +119,74 @@ public class ClimatizerBlockEntity extends LockableContainerBlockEntity implemen
 
     @Override
     public void tick() {
-        if (world != null && !world.isClient()) {
-            ItemStack stack = inventory.get(0);
+        if (world == null || world.isClient) return;
 
-            // Case 1: We still have an item burning
-            if (remainingBurnTime > 0) {
-                remainingBurnTime--;
-                return;
-            }
+        ItemStack stack = inventory.get(0);
 
-            // Case 2: Our burn time ran out
-            // Case 2.1 Time ran out and we have a valid item in the slot
-            if (FUEL_ITEMS.containsKey(stack.getItem())) {
-                Pair<Integer, FuelType> pair = FUEL_ITEMS.get(stack.getItem());
-                remainingBurnTime = pair.getLeft();
-                itemTotalBurnTime = pair.getLeft();
+        // Case 1: There is still an item burning, decrement time
+        // Case 2: The burning item time ran out, consume new if possible
+
+        if (leftoverBurnTime > 0) {
+            leftoverBurnTime--;
+        } else {
+            BlockState state = getCachedState();
+            Pair<Integer, FuelType> fuel = FUEL_ITEMS.get(stack.getItem());
+
+            if (fuel != null) {
+                absoluteBurnTime = leftoverBurnTime = fuel.getLeft();
                 stack.decrement(1);
 
-                switch (pair.getRight()) {
+                switch (fuel.getRight()) {
                     case HEATING:
-                        world.setBlockState(pos, getCachedState().with(ClimatizerBlock.ACTION, ClimatizerBlock.Action.HEAT));
+                        state = state.with(ClimatizerBlock.ACTION, ClimatizerBlock.Action.HEAT);
                         break;
                     case COOLING:
-                        world.setBlockState(pos, getCachedState().with(ClimatizerBlock.ACTION, ClimatizerBlock.Action.COOL));
+                        state = state.with(ClimatizerBlock.ACTION, ClimatizerBlock.Action.COOL);
                         break;
                 }
-                return;
+
+            } else {
+                state = state.with(ClimatizerBlock.ACTION, ClimatizerBlock.Action.OFF);
             }
 
-            // Case 1.2 We have no valid item in the slot and the climatizer stops working
-            world.setBlockState(pos, getCachedState().with(ClimatizerBlock.ACTION, ClimatizerBlock.Action.OFF));
-
-            if (firstUpdate || !isSpreadUpToDate()) {
-                firstUpdate = false;
-                updateSpread();
-
-                //get players inside the maximum range of the block, we still need to check wether they are actually in the
-                //affected blocks
-                List<PlayerEntity> nonSpectatingEntities = world.getNonSpectatingEntities(PlayerEntity.class, getMaximumBox());
-
-                for (PlayerEntity player : nonSpectatingEntities) {
-                    if (isPlayerAffected(player)) {
-                        System.out.println("Player Affected!");
-                    }
-                }
-
-            }
+            world.setBlockState(pos, state);
         }
+
+        if (cooldown < TICK_COOLDOWN) {
+            cooldown++;
+            return;
+        }
+
+        cooldown = 0;
+
+        // if the spread sets are not up to date, update them and re calc
+        if (isSpreadingInvalid() || (effects.isEmpty() && obstruct.isEmpty())) {
+            refreshSpreading();
+            spawnDebugEntities();
+        }
+
+        PlayerStream.around(world, pos, MAX_EFFECT_STRENGTH)
+                .filter(p -> effects.values().stream().anyMatch(pos -> p.getBoundingBox().intersects(new Box(pos))))
+                .forEach(p -> {
+                    p.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.0f);
+                    // TODO: apply temporary effect modifier
+                });
 
     }
 
     @Override
     public void fromTag(BlockState state, CompoundTag compound) {
         super.fromTag(state, compound);
-        remainingBurnTime = compound.getInt("remaining");
-        itemTotalBurnTime = compound.getInt("total");
+        leftoverBurnTime = compound.getInt("remaining");
+        absoluteBurnTime = compound.getInt("total");
         action = ClimatizerBlock.Action.values()[compound.getInt("mode")];
         Inventories.toTag(compound, inventory);
     }
 
     @Override
     public CompoundTag toTag(CompoundTag compound) {
-        compound.putInt("remaining", remainingBurnTime);
-        compound.putInt("total", itemTotalBurnTime);
+        compound.putInt("remaining", leftoverBurnTime);
+        compound.putInt("total", absoluteBurnTime);
         compound.putInt("mode", action.ordinal());
         Inventories.fromTag(compound, inventory);
         return super.toTag(compound);
@@ -189,89 +207,96 @@ public class ClimatizerBlockEntity extends LockableContainerBlockEntity implemen
         return inventory;
     }
 
-    private void updateSpread() {
-        resetSpread();
-
-        //We don't use trackAroundPos here as that would result in index being out of bounds
-        for (Direction dir : Direction.values()) {
-            if (isValidPosition(pos.offset(dir)))
-                filled[MAX_SPREAD].add(pos.offset(dir));
-        }
-
-        runSpreading(MAX_SPREAD - 1);
-
-        //Debugging: check that there are no duplicates between the different sets
-        /*Stream<BlockPos> blockPosStream = Arrays.stream(filled).flatMap(Collection::stream);
-        if (blockPosStream.distinct().count() != blockPosStream.count()) {
-            throw new IllegalStateException("There should not be any intersecting elemements in the set of tracked blocks");
-        }*/
+    private void refreshSpreading() {
+        effects.clear();
+        obstruct.clear();
+        spread(Collections.singleton(pos), MAX_EFFECT_STRENGTH);
     }
 
-    //Recursively tracks all blocks around all tracked blocks with the current strength
-    private void runSpreading(int strength) {
-        //This check is necessary for the recursion to end
-        if (strength > 0) {
-            for (BlockPos tracked : filled[strength + 1]) {
-                trackAroundPos(tracked, strength);
-            }
-            runSpreading(strength - 1);
-        }
-    }
+    private void spread(Collection<BlockPos> blocks, int strength) {
+        if (strength < 0) return;
 
-    private void trackAroundPos(BlockPos pos, int strength) {
-        for (Direction dir : Direction.values()) {
-            BlockPos offset = pos.offset(dir);
+        // search for successor if not present it is empty
+        Collection<BlockPos> successor = effects.get(strength + 1);
+        boolean ignore = successor.isEmpty();
 
-            //Do not add to set if it is already contained in last step.
-            //In other words: Don't go backwards when spreading
-            if (!filled[strength + 1].contains(offset)) {
-                if (isValidPosition(offset))
-                    filled[strength].add(offset);
-                else
-                    obstructed.add(pos);
+        for (BlockPos pos : blocks) {
+            for (Direction direction : Direction.values()) {
+                BlockPos offset = pos.offset(direction);
+                // if successor is not present or the offset pos is not present in the successor or obstruct
+                if (ignore || (!effects.containsValue(offset) && !obstruct.contains(offset))) {
+                    boolean b = hasCriteria(offset);
+                    if (b) effects.get(strength).add(offset);
+                    else obstruct.add(offset);
+                }
             }
         }
+
+        spread(effects.get(strength), strength - 1);
     }
 
-
-    private void resetSpread() {
-        obstructed.clear();
-        for (Set<BlockPos> set : filled)
-            set.clear();
+    /**
+     * Checks if the current block is in a valid state and none of the blocks around has
+     * been changed by the player.
+     *
+     * @return true if the blocks in the collections are up to date
+     */
+    private boolean isSpreadingInvalid() {
+        return obstruct.stream().anyMatch(this::hasCriteria) || effects.values().stream().anyMatch(pos -> !hasCriteria(pos));
     }
 
-    private boolean isSpreadUpToDate() {
-        for (BlockPos pos : obstructed) {
-            if (isValidPosition(pos))
-                return false;
-        }
-        for (Set<BlockPos> set : filled) {
-            for (BlockPos pos : set) {
-                if (!isValidPosition(pos))
-                    return false;
+    private boolean hasCriteria(BlockPos pos) {
+        if (world == null) return false;
+        boolean c = world.isSkyVisible(pos);
+        if (world == null || c) return false;
+        boolean b = world.getBlockState(pos).isFullCube(world, pos);
+        return !b;
+    }
+
+    @Override
+    public void markRemoved() {
+        super.markRemoved();
+        entities.forEach(ArmorStandEntity::kill);
+    }
+
+    private List<ArmorStandEntity> entities = new ArrayList<>();
+
+    private void spawnDebugEntities() {
+        entities.forEach(ArmorStandEntity::kill);
+        entities.clear();
+        for (Map.Entry<Integer, BlockPos> e : effects.entries()) {
+            BlockPos pos = e.getValue();
+            ArmorStandEntity armor = new ArmorStandEntity(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+            try {
+                Method setMarker = ArmorStandEntity.class.getDeclaredMethod("setMarker", boolean.class);
+                setMarker.setAccessible(true);
+                setMarker.invoke(armor, true);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+                ex.printStackTrace();
             }
+            armor.setInvisible(true);
+            armor.setCustomNameVisible(true);
+            armor.setCustomName(Text.of(e.getKey().toString()));
+            armor.setNoGravity(true);
+            entities.add(armor);
+            world.spawnEntity(armor);
         }
-        return true;
-    }
-
-    private boolean isValidPosition(BlockPos pos) {
-        return !world.getBlockState(pos).isFullCube(world, pos) && !world.isSkyVisible(pos);
-    }
-
-    private Box getMaximumBox() {
-        return new Box(pos).expand(MAX_SPREAD);
-    }
-
-    private boolean isPlayerAffected(PlayerEntity playerEntity) {
-        //Only check within the distance between the block and the player
-        int distance = (int) Math.floor(playerEntity.getBlockPos().getSquaredDistance(pos));
-
-        for (int i = MAX_SPREAD; i >= distance; --i) {
-            for (BlockPos pos : filled[i])
-
-                if (playerEntity.getBoundingBox().intersects(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1))
-                    return true;
+        for (BlockPos pos : obstruct) {
+            ArmorStandEntity armor = new ArmorStandEntity(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+            try {
+                Method setMarker = ArmorStandEntity.class.getDeclaredMethod("setMarker", boolean.class);
+                setMarker.setAccessible(true);
+                setMarker.invoke(armor, true);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+                ex.printStackTrace();
+            }
+            armor.setInvisible(true);
+            armor.setCustomNameVisible(true);
+            armor.setCustomName(Text.of("<>"));
+            armor.setNoGravity(true);
+            entities.add(armor);
+            world.spawnEntity(armor);
         }
-        return false;
     }
+
 }
