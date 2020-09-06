@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 
 public class ClimateSlot extends Slot {
+
     public ClimateSlot(Inventory inventory, int index, int x, int y) {
         super(inventory, index, x, y);
     }

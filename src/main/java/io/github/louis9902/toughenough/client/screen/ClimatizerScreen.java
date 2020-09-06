@@ -2,7 +2,7 @@ package io.github.louis9902.toughenough.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.louis9902.toughenough.ToughEnough;
-import io.github.louis9902.toughenough.block.Climatizer;
+import io.github.louis9902.toughenough.block.ClimatizerBlock;
 import io.github.louis9902.toughenough.screenhandler.ClimatizerScreenHandler;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
@@ -26,7 +26,7 @@ public class ClimatizerScreen extends HandledScreen<ClimatizerScreenHandler> {
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
 
         //We render the progress bar based on the operating mode. If the block is OFF we don't render anything
-        Climatizer.Action operatingMode = handler.getOperatingMode();
+        ClimatizerBlock.Action operatingMode = handler.getOperatingMode();
         switch (operatingMode) {
             case COOL:
                 this.drawTexture(matrices, x + 79, y + 50, 176, 0, Math.round(18 * handler.getFuelProgress()), 4);

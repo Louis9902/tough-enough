@@ -1,9 +1,6 @@
 package io.github.louis9902.toughenough.block;
 
-import io.github.louis9902.toughenough.block.blockentity.ClimatizerEntity;
-import io.netty.util.collection.IntObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import io.github.louis9902.toughenough.block.blockentity.ClimatizerBlockEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,7 +22,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class Climatizer extends BlockWithEntity {
+public class ClimatizerBlock extends BlockWithEntity {
 
     public static final DirectionProperty FACING = Properties.FACING;
     public static final EnumProperty<Action> ACTION = EnumProperty.of("action", Action.class);
@@ -62,7 +59,7 @@ public class Climatizer extends BlockWithEntity {
     }
 
 
-    public Climatizer(Settings settings) {
+    public ClimatizerBlock(Settings settings) {
         super(settings);
         BlockState state = getStateManager().getDefaultState();
         setDefaultState(state.with(FACING, Direction.NORTH).with(ACTION, Action.OFF));
@@ -92,7 +89,7 @@ public class Climatizer extends BlockWithEntity {
 
     @Override
     public @Nullable BlockEntity createBlockEntity(BlockView world) {
-        return new ClimatizerEntity();
+        return new ClimatizerBlockEntity();
     }
 
     @Override
