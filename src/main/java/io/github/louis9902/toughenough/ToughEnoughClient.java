@@ -1,11 +1,14 @@
 package io.github.louis9902.toughenough;
 
 import com.mojang.brigadier.Command;
+import io.github.louis9902.toughenough.client.fluid.WaterTypeRenderer;
 import io.github.louis9902.toughenough.client.hud.DebugHudRenderer;
 import io.github.louis9902.toughenough.client.hud.TemperatureHudRenderer;
 import io.github.louis9902.toughenough.client.hud.ThirstHudRenderer;
 import io.github.louis9902.toughenough.client.item.ThermometerPredicicateProvider;
 import io.github.louis9902.toughenough.client.screen.ClimatizerScreen;
+import io.github.louis9902.toughenough.fluid.PurifiedWater;
+import io.github.louis9902.toughenough.init.ToughEnoughFluids;
 import io.github.louis9902.toughenough.init.ToughEnoughItems;
 import io.github.louis9902.toughenough.init.ToughEnoughScreenHandlers;
 import io.github.louis9902.toughenough.item.CanteenItem;
@@ -13,12 +16,15 @@ import io.github.louis9902.toughenough.item.JuiceItem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.object.builder.v1.client.model.FabricModelPredicateProviderRegistry;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemConvertible;
+import net.minecraft.util.Identifier;
 
 import static com.mojang.brigadier.arguments.BoolArgumentType.bool;
 import static com.mojang.brigadier.arguments.BoolArgumentType.getBool;
@@ -39,7 +45,7 @@ public class ToughEnoughClient implements ClientModInitializer {
         TemperatureHudRenderer.register();
         DebugHudRenderer.register();
 
-        // SettingsSyncListener.register();
+        WaterTypeRenderer.register(ToughEnoughFluids.PURIFIED_WATER_STILL, ToughEnoughFluids.PURIFIED_WATER_FLOWING, new Identifier("minecraft", "water"), PurifiedWater.COLOR);
 
         //TODO move this to a proper place sometime
         CommandRegistrationCallback.EVENT.register((dispatcher, ded) -> {
@@ -67,6 +73,7 @@ public class ToughEnoughClient implements ClientModInitializer {
                 .map(ItemConvertible.class::cast)
                 .toArray(ItemConvertible[]::new);
         ColorProviderRegistry.ITEM.register(JuiceItem::colorForStack, juices);
+        ColorProviderRegistry.ITEM.register((stack, index) -> index > 0 ? -1 : PurifiedWater.COLOR, ToughEnoughFluids.PURIFIED_WATER_BUCKET);
     }
 
 }

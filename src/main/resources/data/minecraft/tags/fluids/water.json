@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "tough_enough:purified_still",
-    "tough_enough:purified_flowing"
+    "tough_enough:purified_water_still",
+    "tough_enough:purified_water_flowing"
   ]
 }

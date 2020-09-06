@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "tough_enough:items/bucket_fluid_overlay",
+    "layer1": "tough_enough:items/bucket_empty"
+  }
+}

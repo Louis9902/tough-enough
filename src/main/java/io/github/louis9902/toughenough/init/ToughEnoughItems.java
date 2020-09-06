@@ -29,7 +29,7 @@ public final class ToughEnoughItems {
     public static final Item MAGMA_SHARD;
     public static final Item ICE_SHARD;
 
-    public static final Item CLIMATIZER_ITEM;
+    public static final Item CLIMATIZER;
 
     public static final ImmutableList<JuiceItem> JUICES;
 
@@ -37,7 +37,9 @@ public final class ToughEnoughItems {
         CANTEEN = RegistryHelpers.register("canteen", new CanteenItem(ItemSettings()));
         THERMOMETER = RegistryHelpers.register("thermometer", new Item(ItemSettings()));
         FILTER = RegistryHelpers.register("filter", new Item(ItemSettings()));
-        CLIMATIZER_ITEM = RegistryHelpers.register("climatizer", new BlockItem(ToughEnoughBlocks.CLIMATIZER, ItemSettings()));
+
+        CLIMATIZER = RegistryHelpers.register("climatizer", new BlockItem(ToughEnoughBlocks.CLIMATIZER, ItemSettings()));
+
         MAGMA_SHARD = RegistryHelpers.register("magma_shard", new Item(ItemSettings()));
         ICE_SHARD = RegistryHelpers.register("ice_shard", new Item(ItemSettings()));
 

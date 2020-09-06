@@ -28,56 +28,6 @@ public class ToughEnough implements ModInitializer {
 
     public static final String ID = "tough_enough";
 
-    public static void setupFluidRendering(final Fluid still, final Fluid flowing, final Identifier textureFluidId, final int color) {
-        final Identifier stillSpriteId = new Identifier(textureFluidId.getNamespace(), "block/" + textureFluidId.getPath() + "_still");
-        final Identifier flowingSpriteId = new Identifier(textureFluidId.getNamespace(), "block/" + textureFluidId.getPath() + "_flow");
-
-        // If they're not already present, add the sprites to the block atlas
-        ClientSpriteRegistryCallback.event(SpriteAtlasTexture.BLOCK_ATLAS_TEX).register((atlasTexture, registry) ->
-        {
-            registry.register(stillSpriteId);
-            registry.register(flowingSpriteId);
-        });
-
-        final Identifier fluidId = Registry.FLUID.getId(still);
-        final Identifier listenerId = new Identifier(fluidId.getNamespace(), fluidId.getPath() + "_reload_listener");
-
-        final Sprite[] fluidSprites = {null, null};
-
-        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
-            @Override
-            public Identifier getFabricId() {
-                return listenerId;
-            }
-
-            /**
-             * Get the sprites from the block atlas when resources are reloaded
-             */
-            @Override
-            public void apply(ResourceManager resourceManager) {
-                final Function<Identifier, Sprite> atlas = MinecraftClient.getInstance().getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEX);
-                fluidSprites[0] = atlas.apply(stillSpriteId);
-                fluidSprites[1] = atlas.apply(flowingSpriteId);
-            }
-        });
-
-        // The FluidRenderer gets the sprites and color from a FluidRenderHandler during rendering
-        final FluidRenderHandler renderHandler = new FluidRenderHandler() {
-            @Override
-            public Sprite[] getFluidSprites(BlockRenderView view, BlockPos pos, FluidState state) {
-                return fluidSprites;
-            }
-
-            @Override
-            public int getFluidColor(BlockRenderView view, BlockPos pos, FluidState state) {
-                return color;
-            }
-        };
-
-        FluidRenderHandlerRegistry.INSTANCE.register(still, renderHandler);
-        FluidRenderHandlerRegistry.INSTANCE.register(flowing, renderHandler);
-    }
-
     public static Identifier identifier(String name) {
         return new Identifier(ID, name);
     }
@@ -92,7 +42,5 @@ public class ToughEnough implements ModInitializer {
         ToughEnoughBlockEntities.register();
         ToughEnoughScreenHandlers.register();
         ToughEnoughBlocks.register();
-        setupFluidRendering(ToughEnoughFluids.STILL_PURIFIED_WATER, ToughEnoughFluids.FLOWING_PURIFIED_WATER, new Identifier("minecraft", "water"), 255 << 16);
-        BlockRenderLayerMap.INSTANCE.putFluids(RenderLayer.getTranslucent(), ToughEnoughFluids.STILL_PURIFIED_WATER, ToughEnoughFluids.FLOWING_PURIFIED_WATER);
     }
 }

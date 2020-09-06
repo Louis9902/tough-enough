@@ -10,14 +10,17 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 
 public abstract class PurifiedWater extends WaterFluid {
+
+    public static final int COLOR = 169 << 24 | 54 << 16 | 181 << 8 | 251;
+
     @Override
     public Fluid getFlowing() {
-        return ToughEnoughFluids.FLOWING_PURIFIED_WATER;
+        return ToughEnoughFluids.PURIFIED_WATER_FLOWING;
     }
 
     @Override
     public Fluid getStill() {
-        return ToughEnoughFluids.STILL_PURIFIED_WATER;
+        return ToughEnoughFluids.PURIFIED_WATER_STILL;
     }
 
     @Override
@@ -40,8 +43,8 @@ public abstract class PurifiedWater extends WaterFluid {
         return false;
     }
 
-
     public static class Flowing extends PurifiedWater {
+
         @Override
         protected void appendProperties(StateManager.Builder<Fluid, FluidState> builder) {
             super.appendProperties(builder);
@@ -60,6 +63,7 @@ public abstract class PurifiedWater extends WaterFluid {
     }
 
     public static class Still extends PurifiedWater {
+
         @Override
         public int getLevel(FluidState state) {
             return 8;

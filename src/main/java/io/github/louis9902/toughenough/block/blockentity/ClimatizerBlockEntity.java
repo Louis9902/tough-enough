@@ -8,6 +8,7 @@ import io.github.louis9902.toughenough.screenhandler.ClimatizerScreenHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
@@ -123,19 +124,21 @@ public class ClimatizerBlockEntity extends LockableContainerBlockEntity implemen
     }
 
     @Override
-    public void fromTag(BlockState state, CompoundTag tag) {
-        super.fromTag(state, tag);
-        remainingBurnTime = tag.getInt("remaining");
-        itemTotalBurnTime = tag.getInt("total");
-        action = ClimatizerBlock.Action.values()[tag.getInt("mode")];
+    public void fromTag(BlockState state, CompoundTag compound) {
+        super.fromTag(state, compound);
+        remainingBurnTime = compound.getInt("remaining");
+        itemTotalBurnTime = compound.getInt("total");
+        action = ClimatizerBlock.Action.values()[compound.getInt("mode")];
+        Inventories.toTag(compound, inventory);
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag tag) {
-        tag.putInt("remaining", remainingBurnTime);
-        tag.putInt("total", itemTotalBurnTime);
-        tag.putInt("mode", action.ordinal());
-        return super.toTag(tag);
+    public CompoundTag toTag(CompoundTag compound) {
+        compound.putInt("remaining", remainingBurnTime);
+        compound.putInt("total", itemTotalBurnTime);
+        compound.putInt("mode", action.ordinal());
+        Inventories.fromTag(compound, inventory);
+        return super.toTag(compound);
     }
 
     @Override

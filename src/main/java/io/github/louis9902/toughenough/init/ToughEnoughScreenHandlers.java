@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.screen.ScreenHandlerType;
 
 public class ToughEnoughScreenHandlers {
+    
     public static final ScreenHandlerType<ClimatizerScreenHandler> CLIMATIZER_SCREEN_HANDLER;
 
     static {
