@@ -53,6 +53,6 @@ public class ClimatizerScreenHandler extends ScreenHandler {
 
     @Override
     public boolean canInsertIntoSlot(ItemStack stack, Slot slot) {
-        return stack.getItem() == ToughEnoughItems.ICE_CUBE || stack.getItem() == ToughEnoughItems.MAGMA_SHARD;
+        return stack.getItem() == ToughEnoughItems.ICE_SHARD || stack.getItem() == ToughEnoughItems.MAGMA_SHARD;
     }
 }

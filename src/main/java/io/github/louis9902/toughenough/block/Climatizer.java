@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
 public class Climatizer extends BlockWithEntity {
 
     public static final DirectionProperty FACING = Properties.FACING;
-    public static final EnumProperty<Direction.Axis> AXIS = Properties.HORIZONTAL_AXIS;
     public static final EnumProperty<Action> ACTION = EnumProperty.of("action", Action.class);
 
     private static final VoxelShape RAY_TRACE_SHAPE;
@@ -66,7 +65,7 @@ public class Climatizer extends BlockWithEntity {
     public Climatizer(Settings settings) {
         super(settings);
         BlockState state = getStateManager().getDefaultState();
-        setDefaultState(state.with(FACING, Direction.NORTH).with(AXIS, Direction.Axis.Z).with(ACTION, Action.OFF));
+        setDefaultState(state.with(FACING, Direction.NORTH).with(ACTION, Action.OFF));
     }
 
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
@@ -100,7 +99,6 @@ public class Climatizer extends BlockWithEntity {
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
         builder.add(FACING);
-        builder.add(AXIS);
         builder.add(ACTION);
     }
 

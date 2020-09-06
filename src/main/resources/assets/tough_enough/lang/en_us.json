@@ -8,5 +8,12 @@
   "item.tough_enough.juice_melon": "Melon Juice",
   "item.tough_enough.juice_pumpkin": "Pumpkin Juice",
   "item.tough_enough.juice_sweet_berry": "Sweet Berry Juice",
-  "effect.tough_enough.thirst":"Thirst"
+  "item.tough_enough.thermometer": "Thermometer",
+  "item.tough_enough.filter": "Water Filter",
+  "item.tough_enough.magma_shard": "Magma Shard",
+  "item.tough_enough.ice_shard": "Ice Shard",
+  "block.tough_enough.climatizer": "Climatizer",
+  "effect.tough_enough.thirst":"Thirst",
+  "effect.tough_enough.hyperthermia":"Hyperthermia",
+  "effect.tough_enough.hypothermia":"Hypothermia"
 }

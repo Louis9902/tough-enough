@@ -1,50 +1,79 @@
 {
   "variants": {
-    "action=off,axis=z,facing=down": {
-      "model": "tough_enough:block/climatizer"
+    "action=off,facing=down": {
+      "model": "tough_enough:block/climatizer_off"
     },
-    "action=off,axis=x,facing=down": {
-      "model": "tough_enough:block/climatizer",
-      "y": 90
-    },
-    "action=off,axis=z,facing=up": {
-      "model": "tough_enough:block/climatizer",
+    "action=off,facing=up": {
+      "model": "tough_enough:block/climatizer_off",
       "x": 180
     },
-    "action=off,axis=x,facing=up": {
-      "model": "tough_enough:block/climatizer",
-      "y": 90,
-      "x": 180
-    },
-    "action=off,axis=x,facing=north": {
-      "model": "tough_enough:block/climatizer",
+    "action=off,facing=north": {
+      "model": "tough_enough:block/climatizer_off",
       "x": 270
     },
-    "action=off,axis=x,facing=south": {
-      "model": "tough_enough:block/climatizer",
+    "action=off,facing=south": {
+      "model": "tough_enough:block/climatizer_off",
       "x": 90
     },
-    "action=off,axis=z,facing=east": {
-      "model": "tough_enough:block/climatizer",
+    "action=off,facing=east": {
+      "model": "tough_enough:block/climatizer_off",
       "x": 270,
       "y": 90
     },
-    "action=off,axis=z,facing=west": {
-      "model": "tough_enough:block/climatizer",
+    "action=off,facing=west": {
+      "model": "tough_enough:block/climatizer_off",
       "x": 90,
       "y": 90
     },
-    "action=off,axis=z,facing=north": {
-      "model": "tough_enough:block/climatizer"
+    "action=cool,facing=down": {
+      "model": "tough_enough:block/climatizer_cool"
     },
-    "action=off,axis=z,facing=south": {
-      "model": "tough_enough:block/climatizer"
+    "action=cool,facing=up": {
+      "model": "tough_enough:block/climatizer_cool",
+      "x": 180
     },
-    "action=off,axis=x,facing=east": {
-      "model": "tough_enough:block/climatizer"
+    "action=cool,facing=north": {
+      "model": "tough_enough:block/climatizer_cool",
+      "x": 270
     },
-    "action=off,axis=x,facing=west": {
-      "model": "tough_enough:block/climatizer"
+    "action=cool,facing=south": {
+      "model": "tough_enough:block/climatizer_cool",
+      "x": 90
+    },
+    "action=cool,facing=east": {
+      "model": "tough_enough:block/climatizer_cool",
+      "x": 270,
+      "y": 90
+    },
+    "action=cool,facing=west": {
+      "model": "tough_enough:block/climatizer_cool",
+      "x": 90,
+      "y": 90
+    },
+    "action=heat,facing=down": {
+      "model": "tough_enough:block/climatizer_heat"
+    },
+    "action=heat,facing=up": {
+      "model": "tough_enough:block/climatizer_heat",
+      "x": 180
+    },
+    "action=heat,facing=north": {
+      "model": "tough_enough:block/climatizer_heat",
+      "x": 270
+    },
+    "action=heat,facing=south": {
+      "model": "tough_enough:block/climatizer_heat",
+      "x": 90
+    },
+    "action=heat,facing=east": {
+      "model": "tough_enough:block/climatizer_heat",
+      "x": 270,
+      "y": 90
+    },
+    "action=heat,facing=west": {
+      "model": "tough_enough:block/climatizer_heat",
+      "x": 90,
+      "y": 90
     }
   }
 }
