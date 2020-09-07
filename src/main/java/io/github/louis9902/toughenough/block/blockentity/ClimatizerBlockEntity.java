@@ -6,25 +6,20 @@ import io.github.louis9902.toughenough.block.ClimatizerBlock;
 import io.github.louis9902.toughenough.block.misc.FuckYouInv;
 import io.github.louis9902.toughenough.init.ToughEnoughBlockEntities;
 import io.github.louis9902.toughenough.init.ToughEnoughItems;
+import io.github.louis9902.toughenough.init.ToughEnoughTags;
 import io.github.louis9902.toughenough.screenhandler.ClimatizerScreenHandler;
 import net.fabricmc.fabric.api.server.PlayerStream;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.entity.AreaEffectCloudEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -34,39 +29,43 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-// TODO: consider sidedInventory for this
 public class ClimatizerBlockEntity extends LockableContainerBlockEntity implements Tickable, FuckYouInv, NamedScreenHandlerFactory {
 
+    // The time in ticks how often the spreading logic is done, we dont do this every tick to save performance
+    private static final int SPREADING_COOLDOWN = 20;
+
     private static final HashMap<Item, Pair<Integer, FuelType>> FUEL_ITEMS = new HashMap<>();
-    //private static final ClimatizerFuelRegistry MAP = null;
 
     static {
         FUEL_ITEMS.put(ToughEnoughItems.ICE_SHARD, new Pair<>(400, FuelType.COOLING));
         FUEL_ITEMS.put(ToughEnoughItems.MAGMA_SHARD, new Pair<>(400, FuelType.HEATING));
     }
 
-    private static final int TICK_COOLDOWN = 20;
+    // The maximum range the heat can spread from the source block outwards
+    private static final int SPREADING_RANGE = 10;
+    private final List<ArmorStandEntity> entities = new ArrayList<>();
 
-    private static final int MAX_EFFECT_STRENGTH = 10;
     private static final int INVENTORY_SIZE = 1;
-
     // obstruct are blocks which obstruct a block space
     private final Set<BlockPos> obstruct;
     // effect are blocks which are affected by the climatizer
+
     private final Multimap<Integer, BlockPos> effects;
-
     private final DefaultedList<ItemStack> inventory;
-    private final PropertyDelegate properties;
+    // This is used to sync the burning progress to the client to render the progress bar
 
+    private final PropertyDelegate properties;
+    // The burn time left for the currently used item
     private int leftoverBurnTime;
+    // The total burn time the item currently burning had at the start, this is used to calculate the progress percentage
     private int absoluteBurnTime;
-    private int cooldown = 0;
+    // The counter since the last spreading update
+    private int spreadingCooldownCounter = 0;
 
     private ClimatizerBlock.Action action = ClimatizerBlock.Action.OFF;
 
@@ -79,62 +78,32 @@ public class ClimatizerBlockEntity extends LockableContainerBlockEntity implemen
         effects = Multimaps.newSetMultimap(new HashMap<>(), HashSet::new);
     }
 
-    private enum FuelType {HEATING, COOLING}
-
-    private class Properties implements PropertyDelegate {
-        private static final int INDEX_REMAINING_BURN_TIME = 0;
-        private static final int INDEX_TOTAL_BURN_TIME = 1;
-        private static final int INDEX_ACTION = 2;
-
-        @Override
-        public int get(int index) {
-            switch (index) {
-                case INDEX_REMAINING_BURN_TIME:
-                    return leftoverBurnTime;
-                case INDEX_TOTAL_BURN_TIME:
-                    return absoluteBurnTime;
-                case INDEX_ACTION:
-                    return getCachedState().get(ClimatizerBlock.ACTION).ordinal();
-            }
-            return 0;
-        }
-
-        @Override
-        public void set(int index, int value) {
-            switch (index) {
-                case INDEX_REMAINING_BURN_TIME:
-                    leftoverBurnTime = value;
-                case INDEX_TOTAL_BURN_TIME:
-                    absoluteBurnTime = value;
-                case INDEX_ACTION:
-                    action = ClimatizerBlock.Action.values()[action.ordinal()];
-            }
-        }
-
-        @Override
-        public int size() {
-            return 3;
-        }
+    @Override
+    public boolean isValid(int slot, ItemStack stack) {
+        return stack.getItem().isIn(ToughEnoughTags.CLIMATIZER_ITEMS);
     }
 
     @Override
     public void tick() {
+        // logic is only done on the server
         if (world == null || world.isClient) return;
 
-        ItemStack stack = inventory.get(0);
+        ItemStack fuelItemStack = inventory.get(0);
 
         // Case 1: There is still an item burning, decrement time
         // Case 2: The burning item time ran out, consume new if possible
-
         if (leftoverBurnTime > 0) {
             leftoverBurnTime--;
         } else {
+            // We modify this state according to our fuel item and set it to the block at the end
             BlockState state = getCachedState();
-            Pair<Integer, FuelType> fuel = FUEL_ITEMS.get(stack.getItem());
+            Pair<Integer, FuelType> fuel = FUEL_ITEMS.get(fuelItemStack.getItem());
 
+            // Case 2.1: The Item in the fuel Slot is a valid fuel item and we will consume it
+            // Case 2.2: The Item is not a valid fuel item and the machine turns off
             if (fuel != null) {
                 absoluteBurnTime = leftoverBurnTime = fuel.getLeft();
-                stack.decrement(1);
+                fuelItemStack.decrement(1);
 
                 switch (fuel.getRight()) {
                     case HEATING:
@@ -152,26 +121,42 @@ public class ClimatizerBlockEntity extends LockableContainerBlockEntity implemen
             world.setBlockState(pos, state);
         }
 
-        if (cooldown < TICK_COOLDOWN) {
-            cooldown++;
-            return;
+        if (spreadingCooldownCounter < SPREADING_COOLDOWN) {
+            spreadingCooldownCounter++;
+        } else {
+            ClimatizerBlock.Action currentAction = getCachedState().get(ClimatizerBlock.ACTION);
+            // Only run spreading logic when the machine is turned on,
+            if (!currentAction.equals(ClimatizerBlock.Action.OFF)) {
+                // if the spread sets are not up to date, update them and re calc
+                if (isSpreadingInvalid() || (effects.isEmpty() && obstruct.isEmpty())) {
+                    refreshSpreading();
+                    spawnDebugEntities();
+                }
+
+                // Get any player which is inside the affected area and apply the appropriate temporary effect to them
+                PlayerStream.around(world, pos, SPREADING_RANGE)
+                        .filter(p -> effects.values().stream().anyMatch(pos -> p.getBoundingBox().intersects(new Box(pos))))
+                        .forEach(p -> {
+                            switch (currentAction) {
+                                // TODO: apply temporary effect modifier
+                                case HEAT:
+                                    p.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.0f);
+                                    break;
+                                case COOL:
+                                    p.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.0f);
+                                    break;
+                            }
+                        });
+            }
+            spreadingCooldownCounter = 0;
         }
 
-        cooldown = 0;
+    }
 
-        // if the spread sets are not up to date, update them and re calc
-        if (isSpreadingInvalid() || (effects.isEmpty() && obstruct.isEmpty())) {
-            refreshSpreading();
-            spawnDebugEntities();
-        }
-
-        PlayerStream.around(world, pos, MAX_EFFECT_STRENGTH)
-                .filter(p -> effects.values().stream().anyMatch(pos -> p.getBoundingBox().intersects(new Box(pos))))
-                .forEach(p -> {
-                    p.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.0f);
-                    // TODO: apply temporary effect modifier
-                });
-
+    private void refreshSpreading() {
+        effects.clear();
+        obstruct.clear();
+        spread(Collections.singleton(pos), SPREADING_RANGE);
     }
 
     @Override
@@ -207,11 +192,8 @@ public class ClimatizerBlockEntity extends LockableContainerBlockEntity implemen
         return inventory;
     }
 
-    private void refreshSpreading() {
-        effects.clear();
-        obstruct.clear();
-        spread(Collections.singleton(pos), MAX_EFFECT_STRENGTH);
-    }
+    // Maps the fuel Item to a pair of 1) the respective burn time 2) whether the item should cool or heat
+    private enum FuelType {HEATING, COOLING}
 
     private void spread(Collection<BlockPos> blocks, int strength) {
         if (strength < 0) return;
@@ -259,7 +241,42 @@ public class ClimatizerBlockEntity extends LockableContainerBlockEntity implemen
         entities.forEach(ArmorStandEntity::kill);
     }
 
-    private List<ArmorStandEntity> entities = new ArrayList<>();
+    // Our block specific implementation of the property delegate, this is in a separate class for formatting reasons
+    private class Properties implements PropertyDelegate {
+        private static final int INDEX_REMAINING_BURN_TIME = 0;
+        private static final int INDEX_TOTAL_BURN_TIME = 1;
+        private static final int INDEX_ACTION = 2;
+
+        @Override
+        public int get(int index) {
+            switch (index) {
+                case INDEX_REMAINING_BURN_TIME:
+                    return leftoverBurnTime;
+                case INDEX_TOTAL_BURN_TIME:
+                    return absoluteBurnTime;
+                case INDEX_ACTION:
+                    return getCachedState().get(ClimatizerBlock.ACTION).ordinal();
+            }
+            return 0;
+        }
+
+        @Override
+        public void set(int index, int value) {
+            switch (index) {
+                case INDEX_REMAINING_BURN_TIME:
+                    leftoverBurnTime = value;
+                case INDEX_TOTAL_BURN_TIME:
+                    absoluteBurnTime = value;
+                case INDEX_ACTION:
+                    action = ClimatizerBlock.Action.values()[action.ordinal()];
+            }
+        }
+
+        @Override
+        public int size() {
+            return 3;
+        }
+    }
 
     private void spawnDebugEntities() {
         entities.forEach(ArmorStandEntity::kill);

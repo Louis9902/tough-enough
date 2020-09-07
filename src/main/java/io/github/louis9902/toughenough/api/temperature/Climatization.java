@@ -51,4 +51,8 @@ public class Climatization {
     public int getEndTime() {
         return endTime;
     }
+
+    public int getRemainingTime() {
+        return endTime;
+    }
 }

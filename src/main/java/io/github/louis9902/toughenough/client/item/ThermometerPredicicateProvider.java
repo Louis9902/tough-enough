@@ -15,7 +15,6 @@ import static io.github.louis9902.toughenough.temperature.TemperatureManagerCons
 public class ThermometerPredicicateProvider implements ModelPredicateProvider {
     // TODO don't calculate heat every frame -> MASSIVE performance gain
     private static final int UPDATE_INTERVAL = 60;
-    private static final TemperatureHelper temperatureHelper = new TemperatureHelper();
 
     @Override
     public float call(ItemStack stack, @Nullable ClientWorld clientWorld, @Nullable LivingEntity livingEntity) {
@@ -30,7 +29,7 @@ public class ThermometerPredicicateProvider implements ModelPredicateProvider {
                 return 0.0F;
             }
             BlockPos pos = entity.getBlockPos();
-            int target = temperatureHelper.calcTargetForBlock(clientWorld, pos, null);
+            int target = TemperatureHelper.calcTargetForBlock(clientWorld, pos, null);
             //Scale from [MIN_TARGET;MAX_TARGET] to [0;MIN_TARGET+MAX_TARGET] to [0;1]
             return (target - MIN_TEMPERATURE_TARGET) / ((float) MAX_TEMPERATURE_TARGET - MIN_TEMPERATURE_TARGET);
         }

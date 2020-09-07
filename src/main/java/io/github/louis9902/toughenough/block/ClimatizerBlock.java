@@ -5,6 +5,7 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
@@ -21,6 +22,8 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Random;
 
 public class ClimatizerBlock extends BlockWithEntity {
 
@@ -141,6 +144,35 @@ public class ClimatizerBlock extends BlockWithEntity {
         }
     }
 
+
+    //magic constants for randomDisplayTick methods, avoids allocations for particles aswell
+    private static final float PARTICLE_SCALE = 0.75f;
+    private static final DustParticleEffect PARTICLE_COLD = new DustParticleEffect(0.13f, 0.51f, 0.81f, PARTICLE_SCALE);
+    private static final DustParticleEffect PARTICLE_HOT = new DustParticleEffect(0.81f, 0.33f, 0.13f, PARTICLE_SCALE);
+
+    @Override
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        Action currentAction = state.get(ACTION);
+        if (!currentAction.equals(Action.OFF)) {
+
+            double x = pos.getX();
+            double y = pos.getY() + 0.5D;
+            double z = pos.getZ();
+
+            double randX = random.nextDouble();
+            double randY = random.nextDouble() / 10;
+            double randZ = random.nextDouble();
+
+            switch (currentAction) {
+                case HEAT:
+                    world.addParticle(PARTICLE_HOT, x + randX, y + randY, z + randZ, 0, 0, 0);
+                    break;
+                case COOL:
+                    world.addParticle(PARTICLE_COLD, x + randX, y + randY, z + randZ, 0, 0, 0);
+                    break;
+            }
+        }
+    }
 }
 
 
