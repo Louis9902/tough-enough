@@ -15,7 +15,7 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.RayTraceContext;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +38,7 @@ public class CanteenItem extends DrinkItem {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         // calculate whether the played used the item on a fluid source block
-        BlockHitResult result = rayTrace(world, player, RayTraceContext.FluidHandling.SOURCE_ONLY);
+        BlockHitResult result = raycast(world, player, RaycastContext.FluidHandling.SOURCE_ONLY);
 
         if (result.getType() == HitResult.Type.BLOCK) {
             BlockPos pos = result.getBlockPos();
