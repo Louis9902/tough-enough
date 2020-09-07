@@ -7,21 +7,30 @@ import io.github.louis9902.toughenough.temperature.modifiers.BiomeModifier;
 import io.github.louis9902.toughenough.temperature.modifiers.BlockProximityModifier;
 import io.github.louis9902.toughenough.temperature.modifiers.HealthModifier;
 import io.github.louis9902.toughenough.temperature.modifiers.TimeModifier;
+import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
-import static io.github.louis9902.toughenough.temperature.HeatManagerConstants.DEFAULT_RATE;
-import static io.github.louis9902.toughenough.temperature.HeatManagerConstants.TEMPERATURE_EQUILIBRIUM;
+import static io.github.louis9902.toughenough.temperature.TemperatureManagerConstants.DEFAULT_RATE;
+import static io.github.louis9902.toughenough.temperature.TemperatureManagerConstants.TEMPERATURE_EQUILIBRIUM;
 
 public final class TemperatureHelper {
 
     public static final ArrayList<Modifier> MODIFIERS_TARGET = new ArrayList<>();
     public static final ArrayList<Modifier> MODIFIERS_RATE = new ArrayList<>();
+
+    private static final Registry<Modifier> RATE_MODIFIERS = newRegistry(Modifier.class, "rate_modifiers");
+    private static final Registry<Modifier> TARGET_MODIFIERS = newRegistry(Modifier.class, "target_modifiers");
+
+    private static <T> Registry<T> newRegistry(Class<T> clazz, String name) {
+        return FabricRegistryBuilder.createSimple(clazz, ToughEnough.identifier(name)).buildAndRegister();
+    }
 
     static {
         MODIFIERS_TARGET.add(new BiomeModifier(ToughEnough.identifier("biome")));

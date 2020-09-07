@@ -9,8 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
-import static io.github.louis9902.toughenough.temperature.HeatManagerConstants.MAX_TARGET;
-import static io.github.louis9902.toughenough.temperature.HeatManagerConstants.MIN_TARGET;
+import static io.github.louis9902.toughenough.temperature.TemperatureManagerConstants.MAX_TEMPERATURE_TARGET;
+import static io.github.louis9902.toughenough.temperature.TemperatureManagerConstants.MIN_TEMPERATURE_TARGET;
 
 public class ThermometerPredicicateProvider implements ModelPredicateProvider {
     // TODO don't calculate heat every frame -> MASSIVE performance gain
@@ -32,7 +32,7 @@ public class ThermometerPredicicateProvider implements ModelPredicateProvider {
             BlockPos pos = entity.getBlockPos();
             int target = temperatureHelper.calcTargetForBlock(clientWorld, pos, null);
             //Scale from [MIN_TARGET;MAX_TARGET] to [0;MIN_TARGET+MAX_TARGET] to [0;1]
-            return (target - MIN_TARGET) / ((float) MAX_TARGET - MIN_TARGET);
+            return (target - MIN_TEMPERATURE_TARGET) / ((float) MAX_TEMPERATURE_TARGET - MIN_TEMPERATURE_TARGET);
         }
     }
 }

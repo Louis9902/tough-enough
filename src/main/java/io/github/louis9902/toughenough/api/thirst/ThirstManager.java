@@ -1,7 +1,7 @@
 package io.github.louis9902.toughenough.api.thirst;
 
 import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
-import io.github.louis9902.toughenough.components.DefaultThirstManager;
+import io.github.louis9902.toughenough.thirst.DefaultThirstManager;
 import net.minecraft.item.ItemStack;
 
 public interface ThirstManager extends AutoSyncedComponent {

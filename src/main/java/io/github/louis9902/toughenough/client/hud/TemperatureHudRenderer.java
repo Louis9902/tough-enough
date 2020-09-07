@@ -11,8 +11,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import java.util.function.DoubleUnaryOperator;
 
 import static io.github.louis9902.toughenough.ToughEnoughComponents.TEMPERATURE_MANAGER;
-import static io.github.louis9902.toughenough.temperature.HeatManagerConstants.MAX_TARGET;
-import static io.github.louis9902.toughenough.temperature.HeatManagerConstants.MIN_TARGET;
+import static io.github.louis9902.toughenough.temperature.TemperatureManagerConstants.MAX_TEMPERATURE_TARGET;
+import static io.github.louis9902.toughenough.temperature.TemperatureManagerConstants.MIN_TEMPERATURE_TARGET;
 
 public final class TemperatureHudRenderer extends DrawableHelper {
 
@@ -62,7 +62,7 @@ public final class TemperatureHudRenderer extends DrawableHelper {
             PlayerEntity player = HudRenderHelper.getCameraPlayer();
             if (player != null) {
                 TemperatureManager manager = TEMPERATURE_MANAGER.get(player);
-                float heat = (manager.getTemperature() - MIN_TARGET) / (float) (MAX_TARGET - MIN_TARGET);
+                float heat = (manager.getTemperature() - MIN_TEMPERATURE_TARGET) / (float) (MAX_TEMPERATURE_TARGET - MIN_TEMPERATURE_TARGET);
 
                 int xoff = 1;
 

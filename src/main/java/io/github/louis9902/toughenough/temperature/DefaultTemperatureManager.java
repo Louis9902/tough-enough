@@ -1,76 +1,103 @@
-package io.github.louis9902.toughenough.components;
+package io.github.louis9902.toughenough.temperature;
 
+import io.github.louis9902.toughenough.api.temperature.Climatization;
 import io.github.louis9902.toughenough.api.temperature.TemperatureManager;
 import io.github.louis9902.toughenough.api.debug.DebugMonitor;
-import io.github.louis9902.toughenough.temperature.TemperatureHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static io.github.louis9902.toughenough.ToughEnoughComponents.TEMPERATURE_MANAGER;
-import static io.github.louis9902.toughenough.temperature.HeatManagerConstants.*;
+import static io.github.louis9902.toughenough.temperature.TemperatureManagerConstants.*;
 
 public class DefaultTemperatureManager implements TemperatureManager {
 
     private static final int UPDATE_TICK = 20;
 
     private final PlayerEntity provider;
+    private final Map<Identifier, Climatization> climatization;
 
     public final DebugMonitor targetMonitor = new DebugMonitor();
     public final DebugMonitor rateMonitor = new DebugMonitor();
 
-    private int ticks = 0;
-    private int rateTicks = 0;
+    private int update = 0;
+    private int updateRate = 0;
 
-    private int rate = DEFAULT_RATE;
-    private int target = DEFAULT_TARGET;
+    private int changeRate = DEFAULT_RATE;
+    private int targetTemp = DEFAULT_TARGET;
+
     private int temperature = TEMPERATURE_EQUILIBRIUM;
 
     private boolean debugOutput = false;
 
     public DefaultTemperatureManager(PlayerEntity provider) {
         this.provider = provider;
+        this.climatization = new HashMap<>();
     }
 
     @Override
     public void update() {
-        //no need to update values in creative or spectator mode
+        // no need to update values in creative or spectator mode
         if (provider.isCreative() || provider.isSpectator()) return;
 
-        ticks++;
-        rateTicks++;
-        boolean shouldSync = false;
+        // keep track if some data has been changed and update is necessary
+        boolean sync = false;
 
-        if (ticks == UPDATE_TICK) {
-            ticks = 0;
+        if (++update == UPDATE_TICK) {
+            update = 0;
 
-            int clampedRate = MathHelper.clamp(TemperatureHelper.calcRateForPlayer(provider, rateMonitor), MIN_RATE, MAX_RATE);
-            int clampedTarget = MathHelper.clamp(TemperatureHelper.calcTargetForPlayer(provider, targetMonitor), MIN_TARGET, MAX_TARGET);
+            int targetTemp = calcTargetTemp();
+            int changeRate = calcChangeRate();
 
-            //only sync data when one of the values has changed
-            if (clampedRate != rate || clampedTarget != target) {
-                rate = clampedRate;
-                target = clampedTarget;
-                shouldSync = true;
+            // only sync data when one of the values has changed
+            if (targetTemp != this.targetTemp || changeRate != this.changeRate) {
+                this.changeRate = changeRate;
+                this.targetTemp = targetTemp;
+                sync = true;
             }
         }
 
-        //In case the rate gets reduced we don't want to run forever, so check against >= here
-        if (rateTicks >= rate) {
-            rateTicks = 0;
-            //adjust temperature by one towards target
-            if (temperature < target) {
-                shouldSync = true;
+        // in case the rate gets reduced check with >=
+        boolean changeTemp = ++updateRate >= changeRate;
+
+        for (Climatization effect : climatization.values()) {
+            if (effect.getEndTime() < updateRate) {
+                climatization.remove(effect.getIdentifier());
+            }
+        }
+
+        if (changeTemp) {
+            // reset rate 'time'
+            updateRate = 0;
+
+            // adjust temperature by one towards target
+            if (temperature < targetTemp) {
                 temperature++;
-            } else if (temperature > target) {
-                shouldSync = true;
+                sync = true;
+            } else if (temperature > targetTemp) {
                 temperature--;
+                sync = true;
             }
         }
 
-        if (shouldSync) sync();
+        if (sync) sync();
+    }
+
+    private int calcTargetTemp() {
+        int temperature = TemperatureHelper.calcTargetForPlayer(provider, targetMonitor);
+        temperature += climatization.values().stream().mapToInt(Climatization::getAmount).sum();
+        return MathHelper.clamp(temperature, MIN_TEMPERATURE_TARGET, MAX_TEMPERATURE_TARGET);
+    }
+
+    private int calcChangeRate() {
+        int rate = TemperatureHelper.calcRateForPlayer(provider, rateMonitor);
+        return MathHelper.clamp(rate, MIN_CHANGE_RATE, MAX_CHANGE_RATE);
     }
 
     @Override
@@ -78,8 +105,8 @@ public class DefaultTemperatureManager implements TemperatureManager {
         buf.writeInt(temperature);
         buf.writeBoolean(debugOutput);
         if (debugOutput) {
-            buf.writeInt(target);
-            buf.writeInt(rate);
+            buf.writeInt(targetTemp);
+            buf.writeInt(changeRate);
             targetMonitor.encode(buf);
             rateMonitor.encode(buf);
         }
@@ -90,8 +117,8 @@ public class DefaultTemperatureManager implements TemperatureManager {
         temperature = buf.readInt();
         debugOutput = buf.readBoolean();
         if (debugOutput) {
-            target = buf.readInt();
-            rate = buf.readInt();
+            targetTemp = buf.readInt();
+            changeRate = buf.readInt();
             targetMonitor.decode(buf);
             rateMonitor.decode(buf);
         }
@@ -116,12 +143,12 @@ public class DefaultTemperatureManager implements TemperatureManager {
 
     @Override
     public int getTarget() {
-        return target;
+        return targetTemp;
     }
 
     @Override
     public int getRate() {
-        return rate;
+        return changeRate;
     }
 
     @Override

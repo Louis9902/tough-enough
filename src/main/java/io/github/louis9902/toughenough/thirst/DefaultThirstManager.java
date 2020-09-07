@@ -1,4 +1,4 @@
-package io.github.louis9902.toughenough.components;
+package io.github.louis9902.toughenough.thirst;
 
 import io.github.louis9902.toughenough.ToughEnoughComponents;
 import io.github.louis9902.toughenough.api.thirst.Drink;
