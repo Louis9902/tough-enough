@@ -54,9 +54,40 @@ public class ClimatizerScreenHandler extends ScreenHandler {
         return this.inventory.canPlayerUse(player);
     }
 
-    // TODO: add proper implementation for this
-    public ItemStack transferSlot(PlayerEntity player, int index) {
-        return ItemStack.EMPTY;
+    //This is called when the player shift clicks a slot in the container or his own inventory
+    @Override
+    public ItemStack transferSlot(PlayerEntity player, int invSlot) {
+        ItemStack newStack = ItemStack.EMPTY;
+        Slot slot = this.slots.get(invSlot);
+        if (slot != null && slot.hasStack()) {
+            //The ItemStack that was shift clicked on
+            ItemStack originalStack = slot.getStack();
+            newStack = originalStack.copy();
+            //Case 1: Player shift clicked on slot in container -> insert into player inventory
+            if (invSlot < this.inventory.size()) {
+                //return empty item stack if insertion fails
+                if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
+                    return ItemStack.EMPTY;
+                }
+            }
+            //Case 2: Player shift clicked on slot in his inventory -> insert into container
+            else if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) {
+                //return empty item stack if insertion fails
+                return ItemStack.EMPTY;
+            }
+
+            //Case 1: The clicked on stack was completely transferred
+            if (originalStack.isEmpty()) {
+                slot.setStack(ItemStack.EMPTY);
+            }
+            //Case 2: It was not completely consumed
+            else {
+                slot.markDirty();
+            }
+        }
+
+        //Todo why does it return this
+        return newStack;
     }
 
     @Environment(EnvType.CLIENT)

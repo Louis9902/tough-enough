@@ -1,8 +1,8 @@
 package io.github.louis9902.toughenough.temperature;
 
+import io.github.louis9902.toughenough.api.debug.DebugMonitor;
 import io.github.louis9902.toughenough.api.temperature.Climatization;
 import io.github.louis9902.toughenough.api.temperature.TemperatureManager;
-import io.github.louis9902.toughenough.api.debug.DebugMonitor;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
@@ -67,7 +67,7 @@ public class DefaultTemperatureManager implements TemperatureManager {
         boolean changeTemp = ++updateRate >= changeRate;
 
         for (Climatization effect : climatization.values()) {
-            if (effect.getEndTime() < updateRate) {
+            if (effect.getRemainingTime() < updateRate) {
                 climatization.remove(effect.getIdentifier());
             }
         }
