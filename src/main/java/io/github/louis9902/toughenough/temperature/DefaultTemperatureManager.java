@@ -1,10 +1,12 @@
 package io.github.louis9902.toughenough.temperature;
 
-import io.github.louis9902.toughenough.api.debug.DebugMonitor;
-import io.github.louis9902.toughenough.api.temperature.Climatization;
+import io.github.louis9902.toughenough.api.temperature.Modifier;
 import io.github.louis9902.toughenough.api.temperature.TemperatureManager;
+import io.github.louis9902.toughenough.api.debug.DebugMonitor;
+import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -21,7 +23,8 @@ public class DefaultTemperatureManager implements TemperatureManager {
     private static final int UPDATE_TICK = 20;
 
     private final PlayerEntity provider;
-    private final Map<Identifier, Climatization> climatization;
+    private final Map<Identifier, Modifier.Temporary> modifiersTarget;
+    private final Map<Identifier, Modifier.Temporary> modifiersRate;
 
     public final DebugMonitor targetMonitor = new DebugMonitor();
     public final DebugMonitor rateMonitor = new DebugMonitor();
@@ -29,8 +32,8 @@ public class DefaultTemperatureManager implements TemperatureManager {
     private int update = 0;
     private int updateRate = 0;
 
-    private int changeRate = DEFAULT_RATE;
-    private int targetTemp = DEFAULT_TARGET;
+    private int changeRate = DEFAULT_CHANGE_RATE;
+    private int targetTemp = DEFAULT_TEMPERATURE_TARGET;
 
     private int temperature = TEMPERATURE_EQUILIBRIUM;
 
@@ -38,7 +41,29 @@ public class DefaultTemperatureManager implements TemperatureManager {
 
     public DefaultTemperatureManager(PlayerEntity provider) {
         this.provider = provider;
-        this.climatization = new HashMap<>();
+        this.modifiersTarget = new HashMap<>();
+        this.modifiersRate = new HashMap<>();
+    }
+
+    @Override
+    public void addModifierTarget(Identifier identifier, int amount, int duration) {
+        addModifier(modifiersTarget, identifier, amount, duration);
+    }
+
+    @Override
+    public void addModifierRate(Identifier identifier, int amount, int duration) {
+        addModifier(modifiersRate, identifier, amount, duration);
+    }
+
+    private static void addModifier(Map<Identifier, Modifier.Temporary> map, Identifier identifier, int amount, int duration) {
+        Modifier.Temporary modifier = map.get(identifier);
+        if (modifier == null) {
+            modifier = new Modifier.Temporary(identifier, amount, duration);
+            map.put(identifier, modifier);
+        } else {
+            modifier.setAmount(amount);
+            modifier.setDuration(duration);
+        }
     }
 
     @Override
@@ -49,8 +74,21 @@ public class DefaultTemperatureManager implements TemperatureManager {
         // keep track if some data has been changed and update is necessary
         boolean sync = false;
 
-        if (++update == UPDATE_TICK) {
+        ++update;
+        ++updateRate;
+
+        if (update == UPDATE_TICK) {
             update = 0;
+
+            modifiersTarget.values().stream()
+                    .filter(Modifier.Temporary::update)
+                    .map(Modifier.Temporary::getIdentifier)
+                    .forEach(modifiersTarget::remove);
+
+            modifiersRate.values().stream()
+                    .filter(Modifier.Temporary::update)
+                    .map(Modifier.Temporary::getIdentifier)
+                    .forEach(modifiersRate::remove);
 
             int targetTemp = calcTargetTemp();
             int changeRate = calcChangeRate();
@@ -64,15 +102,7 @@ public class DefaultTemperatureManager implements TemperatureManager {
         }
 
         // in case the rate gets reduced check with >=
-        boolean changeTemp = ++updateRate >= changeRate;
-
-        for (Climatization effect : climatization.values()) {
-            if (effect.getRemainingTime() < updateRate) {
-                climatization.remove(effect.getIdentifier());
-            }
-        }
-
-        if (changeTemp) {
+        if (updateRate >= changeRate) {
             // reset rate 'time'
             updateRate = 0;
 
@@ -91,12 +121,13 @@ public class DefaultTemperatureManager implements TemperatureManager {
 
     private int calcTargetTemp() {
         int temperature = TemperatureHelper.calcTargetForPlayer(provider, targetMonitor);
-        temperature += climatization.values().stream().mapToInt(Climatization::getAmount).sum();
+        temperature += modifiersTarget.values().stream().mapToInt(Modifier.Temporary::getAmount).sum();
         return MathHelper.clamp(temperature, MIN_TEMPERATURE_TARGET, MAX_TEMPERATURE_TARGET);
     }
 
     private int calcChangeRate() {
         int rate = TemperatureHelper.calcRateForPlayer(provider, rateMonitor);
+        rate += modifiersRate.values().stream().mapToInt(Modifier.Temporary::getAmount).sum();
         return MathHelper.clamp(rate, MIN_CHANGE_RATE, MAX_CHANGE_RATE);
     }
 
@@ -125,15 +156,44 @@ public class DefaultTemperatureManager implements TemperatureManager {
     }
 
     @Override
-    public void readFromNbt(CompoundTag tag) {
-        //target and rate don't need to be saved in NBT as they can be reproduced with our functions easily
-        temperature = tag.getInt("temperature");
+    public void readFromNbt(CompoundTag compound) {
+        temperature = compound.getInt("Temperature");
+
+        modifiersTarget.clear();
+        compound.getList("TargetModifiers", NbtType.COMPOUND).stream()
+                .map(CompoundTag.class::cast)
+                .map(Modifier.Temporary::new)
+                .forEach(modifier -> modifiersTarget.put(modifier.getIdentifier(), modifier));
+
+        modifiersRate.clear();
+        compound.getList("RateModifiers", NbtType.COMPOUND).stream()
+                .map(CompoundTag.class::cast)
+                .map(Modifier.Temporary::new)
+                .forEach(modifier -> modifiersRate.put(modifier.getIdentifier(), modifier));
+
         sync();
     }
 
     @Override
-    public void writeToNbt(CompoundTag tag) {
-        tag.putInt("temperature", temperature);
+    public void writeToNbt(CompoundTag compound) {
+        compound.putInt("Temperature", temperature);
+
+        ListTag modifiers;
+        int index;
+
+        modifiers = new ListTag();
+        index = 0;
+        for (Modifier.Temporary value : modifiersTarget.values()) {
+            modifiers.add(index++, value.encode());
+        }
+        compound.put("TargetModifiers", modifiers);
+
+        modifiers = new ListTag();
+        index = 0;
+        for (Modifier.Temporary value : modifiersRate.values()) {
+            modifiers.add(index++, value.encode());
+        }
+        compound.put("RateModifiers", modifiers);
     }
 
     @Override

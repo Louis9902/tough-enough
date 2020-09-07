@@ -68,6 +68,7 @@ public class ClimatizerBlock extends BlockWithEntity {
         setDefaultState(state.with(FACING, Direction.NORTH).with(ACTION, Action.OFF));
     }
 
+    @SuppressWarnings("deprecation")
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         switch (state.get(FACING)) {
             case DOWN:
@@ -86,6 +87,7 @@ public class ClimatizerBlock extends BlockWithEntity {
         return UP_SHAPE;
     }
 
+    @SuppressWarnings("deprecation")
     public VoxelShape getRaycastShape(BlockState state, BlockView world, BlockPos pos) {
         return RAY_TRACE_SHAPE;
     }
@@ -107,6 +109,7 @@ public class ClimatizerBlock extends BlockWithEntity {
         return this.getDefaultState().with(FACING, ctx.getSide().getOpposite());
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!world.isClient) {

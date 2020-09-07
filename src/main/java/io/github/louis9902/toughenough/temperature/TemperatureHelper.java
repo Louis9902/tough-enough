@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
-import static io.github.louis9902.toughenough.temperature.TemperatureManagerConstants.DEFAULT_RATE;
+import static io.github.louis9902.toughenough.temperature.TemperatureManagerConstants.DEFAULT_CHANGE_RATE;
 import static io.github.louis9902.toughenough.temperature.TemperatureManagerConstants.TEMPERATURE_EQUILIBRIUM;
 
 public final class TemperatureHelper {
@@ -70,6 +70,6 @@ public final class TemperatureHelper {
                         monitor.add(modifier.getIdentifier().getPath(), Integer.toString(value));
                     return value;
                 })
-                .reduce(DEFAULT_RATE, Integer::sum);
+                .reduce(DEFAULT_CHANGE_RATE, Integer::sum);
     }
 }

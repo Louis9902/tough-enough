@@ -7,7 +7,7 @@ import java.util.*;
 
 public class DebugMonitor implements Iterable<Map.Entry<String, String>> {
 
-    protected HashMap<String, String> values = new HashMap<>();
+    protected final HashMap<String, String> values = new HashMap<>();
 
     public Optional<String> get(@NotNull String identifier) {
         return Optional.ofNullable(values.get(identifier));

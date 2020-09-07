@@ -11,6 +11,7 @@ public class ToughEnoughBlockEntities {
         CLIMATIZER_ENTITY_TYPE = RegistryHelpers.register("climatizer", BlockEntityType.Builder.create(ClimatizerBlockEntity::new, ToughEnoughBlocks.CLIMATIZER));
     }
 
+    @SuppressWarnings("EmptyMethod")
     public static void register() {
         // keep for class initialisation (call from initializer)
     }

@@ -2,6 +2,8 @@ package io.github.louis9902.toughenough.block.blockentity;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import io.github.louis9902.toughenough.ToughEnough;
+import io.github.louis9902.toughenough.ToughEnoughComponents;
 import io.github.louis9902.toughenough.block.ClimatizerBlock;
 import io.github.louis9902.toughenough.block.misc.FuckYouInv;
 import io.github.louis9902.toughenough.init.ToughEnoughBlockEntities;
@@ -20,7 +22,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Pair;
@@ -138,12 +139,11 @@ public class ClimatizerBlockEntity extends LockableContainerBlockEntity implemen
                         .filter(p -> effects.values().stream().anyMatch(pos -> p.getBoundingBox().intersects(new Box(pos))))
                         .forEach(p -> {
                             switch (currentAction) {
-                                // TODO: apply temporary effect modifier
                                 case HEAT:
-                                    p.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.0f);
+                                    ToughEnoughComponents.TEMPERATURE_MANAGER.get(p).addModifierTarget(ToughEnough.identifier("climatization"),4,1);
                                     break;
                                 case COOL:
-                                    p.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 0.0f);
+                                    ToughEnoughComponents.TEMPERATURE_MANAGER.get(p).addModifierTarget(ToughEnough.identifier("climatization"),-4,1);
                                     break;
                             }
                         });

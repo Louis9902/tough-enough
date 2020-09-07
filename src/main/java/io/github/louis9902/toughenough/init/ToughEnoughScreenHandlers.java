@@ -13,6 +13,7 @@ public class ToughEnoughScreenHandlers {
         CLIMATIZER_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(ToughEnough.identifier("climatizer"), ClimatizerScreenHandler::new);
     }
 
+    @SuppressWarnings("EmptyMethod")
     public static void register() {
         // keep for class initialisation (call from initializer)
     }

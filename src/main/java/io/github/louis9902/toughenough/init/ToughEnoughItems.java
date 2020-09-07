@@ -58,6 +58,7 @@ public final class ToughEnoughItems {
         return new Item.Settings().group(GROUP);
     }
 
+    @SuppressWarnings("EmptyMethod")
     public static void register() {
         // keep for class initialisation (call from initializer)
     }
