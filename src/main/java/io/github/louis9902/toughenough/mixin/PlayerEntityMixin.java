@@ -1,7 +1,5 @@
 package io.github.louis9902.toughenough.mixin;
 
-import io.github.louis9902.toughenough.api.temperature.TemperatureManager;
-import io.github.louis9902.toughenough.api.thirst.ThirstManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.HungerManager;
@@ -12,30 +10,16 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static io.github.louis9902.toughenough.ToughEnoughComponents.*;
+import static io.github.louis9902.toughenough.ToughEnoughComponents.DRINKABLE;
+import static io.github.louis9902.toughenough.ToughEnoughComponents.THIRST_MANAGER;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends Entity {
 
     public PlayerEntityMixin(EntityType<?> type, World world) {
         super(type, world);
-    }
-
-    /**
-     * Our ThirstManager needs to be updated every tick, therefore we mixin into the tick method and get the
-     * {@link ThirstManager ThirstManager Component} and call its update method.
-     * <p>
-     * If the component is not present for some reason, nothing will be done
-     */
-    @Inject(at = @At(value = "HEAD"), method = "tick")
-    public void tick(CallbackInfo ci) {
-        if (!world.isClient) {
-            THIRST_MANAGER.maybeGet(this).ifPresent(ThirstManager::update);
-            TEMPERATURE_MANAGER.maybeGet(this).ifPresent(TemperatureManager::update);
-        }
     }
 
     /**

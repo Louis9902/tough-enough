@@ -72,7 +72,7 @@ public class DefaultThirstManager implements ThirstManager {
 
     //Todo replenish thirst when difficulty is peaceful
     @Override
-    public void update() {
+    public void tick() {
         //no need to update values in creative or spectator mode
         if (provider.isCreative() || provider.isSpectator()) return;
         PlayerEntity player = provider;
@@ -140,9 +140,8 @@ public class DefaultThirstManager implements ThirstManager {
     }
 
     //We override this to avoid using NBT in network transmission to save traffic
-
     @Override
-    public void writeToPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
+    public void writeToPacket(PacketByteBuf buf, ServerPlayerEntity recipient, int syncOp) {
         buf.writeInt(thirst);
         buf.writeBoolean(debugOutput);
         if (debugOutput) {
@@ -181,7 +180,7 @@ public class DefaultThirstManager implements ThirstManager {
     //Other players do not receive the information to avoid unnecessary traffic
 
     @Override
-    public boolean shouldSyncWith(ServerPlayerEntity player) {
+    public boolean shouldSyncWith(ServerPlayerEntity player, int syncOp) {
         return player == this.provider || player.getCameraEntity() == provider;
     }
 

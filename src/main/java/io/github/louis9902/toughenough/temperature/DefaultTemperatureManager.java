@@ -1,8 +1,8 @@
 package io.github.louis9902.toughenough.temperature;
 
+import io.github.louis9902.toughenough.api.debug.DebugMonitor;
 import io.github.louis9902.toughenough.api.temperature.Modifier;
 import io.github.louis9902.toughenough.api.temperature.TemperatureManager;
-import io.github.louis9902.toughenough.api.debug.DebugMonitor;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
@@ -67,7 +67,7 @@ public class DefaultTemperatureManager implements TemperatureManager {
     }
 
     @Override
-    public void update() {
+    public void tick() {
         // no need to update values in creative or spectator mode
         if (provider.isCreative() || provider.isSpectator()) return;
 
@@ -132,7 +132,7 @@ public class DefaultTemperatureManager implements TemperatureManager {
     }
 
     @Override
-    public void writeToPacket(PacketByteBuf buf, ServerPlayerEntity recipient) {
+    public void writeToPacket(PacketByteBuf buf, ServerPlayerEntity recipient, int syncOp) {
         buf.writeInt(temperature);
         buf.writeBoolean(debugOutput);
         if (debugOutput) {
@@ -235,7 +235,7 @@ public class DefaultTemperatureManager implements TemperatureManager {
     //We override this so that calling sync() only transmits the thirst information to the player it
     //belongs to or to players spectating him, this is to save network traffic!
     @Override
-    public boolean shouldSyncWith(ServerPlayerEntity player) {
+    public boolean shouldSyncWith(ServerPlayerEntity player, int SyncOp) {
         return player == provider || player.getCameraEntity() == provider;
     }
 

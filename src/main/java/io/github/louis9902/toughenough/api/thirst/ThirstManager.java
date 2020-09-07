@@ -1,10 +1,11 @@
 package io.github.louis9902.toughenough.api.thirst;
 
 import dev.onyxstudios.cca.api.v3.component.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.component.ServerTickingComponent;
 import io.github.louis9902.toughenough.thirst.DefaultThirstManager;
 import net.minecraft.item.ItemStack;
 
-public interface ThirstManager extends AutoSyncedComponent {
+public interface ThirstManager extends AutoSyncedComponent, ServerTickingComponent {
 
     static int getMaxThirst() {
         return DefaultThirstManager.MAX_THIRST_LEVEL;
@@ -21,11 +22,6 @@ public interface ThirstManager extends AutoSyncedComponent {
     void setHydration(float h);
 
     void setExhaustion(float e);
-
-    /**
-     * This will run the internal logic of the {@link ThirstManager} and should be called every tick from the Player
-     */
-    void update();
 
     /**
      * This will get the {@link Drink} from the ItemStack and add its values to the {@link ThirstManager}
