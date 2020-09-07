@@ -85,8 +85,6 @@ public class ClimatizerScreenHandler extends ScreenHandler {
                 slot.markDirty();
             }
         }
-
-        //Todo why does it return this
         return newStack;
     }
 

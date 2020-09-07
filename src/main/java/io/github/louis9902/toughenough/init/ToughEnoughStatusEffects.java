@@ -17,6 +17,7 @@ public final class ToughEnoughStatusEffects {
         THIRST = RegistryHelpers.register("thirst", new ThirstStatusEffect());
     }
 
+    @SuppressWarnings("EmptyMethod")
     public static void register() {
         // keep for class initialisation (call from initializer)
     }

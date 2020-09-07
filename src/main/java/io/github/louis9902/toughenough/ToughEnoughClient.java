@@ -16,12 +16,10 @@ import io.github.louis9902.toughenough.item.JuiceItem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.object.builder.v1.client.model.FabricModelPredicateProviderRegistry;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.util.Identifier;
@@ -48,18 +46,16 @@ public class ToughEnoughClient implements ClientModInitializer {
         WaterTypeRenderer.register(ToughEnoughFluids.PURIFIED_WATER_STILL, ToughEnoughFluids.PURIFIED_WATER_FLOWING, new Identifier("minecraft", "water"), PurifiedWater.COLOR);
 
         //TODO move this to a proper place sometime
-        CommandRegistrationCallback.EVENT.register((dispatcher, ded) -> {
-            dispatcher.register(literal("tough_enough")
-                    .then(literal("debug")
-                            .then(argument("bool", bool())
-                                    .executes(ctx -> {
-                                        PlayerEntity player = ctx.getSource().getPlayer();
-                                        boolean arg = getBool(ctx, "bool");
-                                        ToughEnoughComponents.THIRST_MANAGER.get(player).setDebug(arg);
-                                        ToughEnoughComponents.TEMPERATURE_MANAGER.get(player).setDebug(arg);
-                                        return Command.SINGLE_SUCCESS;
-                                    }))));
-        });
+        CommandRegistrationCallback.EVENT.register((dispatcher, ded) -> dispatcher.register(literal("tough_enough")
+                .then(literal("debug")
+                        .then(argument("bool", bool())
+                                .executes(ctx -> {
+                                    PlayerEntity player = ctx.getSource().getPlayer();
+                                    boolean arg = getBool(ctx, "bool");
+                                    ToughEnoughComponents.THIRST_MANAGER.get(player).setDebug(arg);
+                                    ToughEnoughComponents.TEMPERATURE_MANAGER.get(player).setDebug(arg);
+                                    return Command.SINGLE_SUCCESS;
+                                })))));
     }
 
     private static void registerModelPredicates() {

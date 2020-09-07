@@ -1,8 +1,6 @@
 package io.github.louis9902.toughenough.temperature;
 
 import io.github.louis9902.toughenough.api.temperature.Modifier;
-import io.github.louis9902.toughenough.api.debug.DebugMonitor;
-import io.github.louis9902.toughenough.api.temperature.Climatization;
 import io.github.louis9902.toughenough.api.temperature.TemperatureManager;
 import io.github.louis9902.toughenough.api.debug.DebugMonitor;
 import net.fabricmc.fabric.api.util.NbtType;

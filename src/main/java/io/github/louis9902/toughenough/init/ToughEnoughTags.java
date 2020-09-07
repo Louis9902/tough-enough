@@ -19,6 +19,7 @@ public final class ToughEnoughTags {
         CLIMATIZER_ITEMS = TagRegistry.item(ToughEnough.identifier("climatizer_items"));
     }
 
+    @SuppressWarnings("EmptyMethod")
     public static void register() {
         // keep for class initialisation (call from initializer)
     }

@@ -1,6 +1,5 @@
 package io.github.louis9902.toughenough.client.fluid;
 
-import io.github.louis9902.toughenough.init.ToughEnoughFluids;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;

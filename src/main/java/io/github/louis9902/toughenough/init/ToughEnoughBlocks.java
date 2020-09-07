@@ -12,6 +12,7 @@ public class ToughEnoughBlocks {
         CLIMATIZER = RegistryHelpers.register("climatizer", new ClimatizerBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)));
     }
 
+    @SuppressWarnings("EmptyMethod")
     public static void register() {
         // keep for class initialisation (call from initializer)
     }

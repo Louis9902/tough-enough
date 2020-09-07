@@ -2,7 +2,6 @@ package io.github.louis9902.toughenough.thirst;
 
 import io.github.louis9902.toughenough.api.thirst.Drink;
 import io.github.louis9902.toughenough.components.DefaultDrink;
-import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 
 import java.util.HashMap;

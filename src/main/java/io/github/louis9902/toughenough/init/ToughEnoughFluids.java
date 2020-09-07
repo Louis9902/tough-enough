@@ -24,6 +24,7 @@ public class ToughEnoughFluids {
         });
     }
 
+    @SuppressWarnings("EmptyMethod")
     public static void register() {
         // keep for class initialisation (call from initializer)
     }
