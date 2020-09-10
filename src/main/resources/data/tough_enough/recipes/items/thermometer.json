@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "TiT",
+    " # "
+  ],
+  "key": {
+    "#": {
+      "item": "tough_enough:magma_shard"
+    },
+    "T": {
+      "item": "tough_enough:ice_shard"
+    },
+    "i": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "item": "tough_enough:thermometer",
+    "count": 1
+  }
+}

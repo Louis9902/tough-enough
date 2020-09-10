@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "tough_enough:items/potion_overlay",
+    "layer1": "tough_enough:items/potion"
+  }
+}

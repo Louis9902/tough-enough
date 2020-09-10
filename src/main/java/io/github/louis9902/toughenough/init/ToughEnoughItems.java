@@ -54,7 +54,7 @@ public final class ToughEnoughItems {
         );
     }
 
-    private static Item.Settings ItemSettings() {
+    public static Item.Settings ItemSettings() {
         return new Item.Settings().group(GROUP);
     }
 

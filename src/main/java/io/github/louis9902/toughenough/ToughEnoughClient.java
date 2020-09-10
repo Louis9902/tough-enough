@@ -71,7 +71,7 @@ public class ToughEnoughClient implements ClientModInitializer {
                 .map(ItemConvertible.class::cast)
                 .toArray(ItemConvertible[]::new);
         ColorProviderRegistry.ITEM.register(JuiceItem::colorForStack, juices);
-        ColorProviderRegistry.ITEM.register((stack, index) -> index > 0 ? -1 : PurifiedWater.COLOR, ToughEnoughFluids.PURIFIED_WATER_BUCKET);
+        ColorProviderRegistry.ITEM.register((stack, index) -> index > 0 ? -1 : PurifiedWater.COLOR, ToughEnoughFluids.PURIFIED_WATER_BUCKET, ToughEnoughFluids.PURIFIED_WATER_BOTTLE);
     }
 
 }

@@ -2,29 +2,20 @@ package io.github.louis9902.toughenough;
 
 import io.github.louis9902.toughenough.init.*;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
-import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
-import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
-import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceType;
+import net.fabricmc.fabric.api.loot.v1.FabricLootPoolBuilder;
+import net.fabricmc.fabric.api.loot.v1.event.LootTableLoadingCallback;
+import net.minecraft.loot.ConstantLootTableRange;
+import net.minecraft.loot.LootPool;
+import net.minecraft.loot.condition.RandomChanceLootCondition;
+import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.BlockRenderView;
-
-import java.util.function.Function;
 
 
 public class ToughEnough implements ModInitializer {
+    private static final Identifier MAGMA_BLOCK_LOOT_TABLE_ID = new Identifier("minecraft", "blocks/magma_block");
+    private static final Identifier ICE_BLOCK_LOOT_TABLE_ID = new Identifier("minecraft", "blocks/ice");
+    private static final Identifier PACKED_ICE_BLOCK_LOOT_TABLE_ID = new Identifier("minecraft", "blocks/packed_ice");
+    private static final Identifier BLUE_ICE_BLOCK_LOOT_TABLE_ID = new Identifier("minecraft", "blocks/blue_ice");
 
     public static final String ID = "tough_enough";
 
@@ -42,5 +33,25 @@ public class ToughEnough implements ModInitializer {
         ToughEnoughBlockEntities.register();
         ToughEnoughScreenHandlers.register();
         ToughEnoughBlocks.register();
+
+        LootTableLoadingCallback.EVENT.register((resourceManager, lootManager, id, supplier, lootTableSetter) -> {
+            if (id.equals(MAGMA_BLOCK_LOOT_TABLE_ID)) {
+                LootPool pool = FabricLootPoolBuilder.builder()
+                        .withEntry(ItemEntry.builder(ToughEnoughItems.MAGMA_SHARD).build())
+                        .withCondition(RandomChanceLootCondition.builder(0.5f).build())
+                        .rolls(ConstantLootTableRange.create(1))
+                        .build();
+
+                supplier.withPool(pool);
+            } else if (id.equals(ICE_BLOCK_LOOT_TABLE_ID) || id.equals(PACKED_ICE_BLOCK_LOOT_TABLE_ID) || id.equals(BLUE_ICE_BLOCK_LOOT_TABLE_ID)) {
+                LootPool pool = FabricLootPoolBuilder.builder()
+                        .withEntry(ItemEntry.builder(ToughEnoughItems.ICE_SHARD).build())
+                        .withCondition(RandomChanceLootCondition.builder(0.5f).build())
+                        .rolls(ConstantLootTableRange.create(1))
+                        .build();
+
+                supplier.withPool(pool);
+            }
+        });
     }
 }

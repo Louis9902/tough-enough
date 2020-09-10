@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:beetroot"
+    },
+    {
+      "item": "tough_enough:purified_water_bottle"
+    }
+  ],
+  "result": {
+    "item": "tough_enough:juice_beetroot",
+    "count": 1
+  }
+}

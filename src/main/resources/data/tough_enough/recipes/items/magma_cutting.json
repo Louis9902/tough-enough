@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "minecraft:magma_block"
+  },
+  "result": "tough_enough:magma_shard",
+  "count": 4
+}

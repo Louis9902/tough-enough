@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:carrot"
+    },
+    {
+      "item": "tough_enough:purified_water_bottle"
+    }
+  ],
+  "result": {
+    "item": "tough_enough:juice_carrot",
+    "count": 1
+  }
+}

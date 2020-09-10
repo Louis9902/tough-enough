@@ -9,6 +9,11 @@ repositories {
         name = "Ladysnake Libs"
         url = 'https://dl.bintray.com/ladysnake/libs'
     }
+
+    maven {
+        name = "CurseMaven"
+        url = "https://www.cursemaven.com"
+    }
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -33,6 +38,8 @@ dependencies {
     modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:$project.cardinal_components_version"
     modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:$project.cardinal_components_version"
     modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-item:$project.cardinal_components_version"
+
+    modRuntime "me.shedaniel:RoughlyEnoughItems:5.4.1"
 }
 
 processResources {
