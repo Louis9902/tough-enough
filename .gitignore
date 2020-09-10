@@ -113,3 +113,5 @@ gradle-app.setting
 
 # Common working directory
 /run/**
+
+/remappedSrc/**

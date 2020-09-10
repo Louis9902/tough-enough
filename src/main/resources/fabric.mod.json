@@ -9,30 +9,31 @@
     "manymoney2"
   ],
   "contact": {
-    "repo": "https://github.com/louis9902/tough-enough"
+    "repo": "https://github.com/minnecraeft/tough-enough"
   },
   "license": "GPL-3.0",
   "icon": "assets/tough_enough/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [
-      "io.github.louis9902.toughenough.ToughEnoughClient"
+      "io.github.minnecraeft.toughenough.ToughEnoughClient"
     ],
     "main": [
-      "io.github.louis9902.toughenough.ToughEnough"
+      "io.github.minnecraeft.toughenough.ToughEnough"
     ],
     "cardinal-components-entity": [
-      "io.github.louis9902.toughenough.ToughEnoughComponents"
+      "io.github.minnecraeft.toughenough.ToughEnoughComponents"
     ],
     "cardinal-components-item": [
-      "io.github.louis9902.toughenough.ToughEnoughComponents"
+      "io.github.minnecraeft.toughenough.ToughEnoughComponents"
     ]
   },
   "custom": {
     "cardinal-components": [
       "tough_enough:drinkable",
-      "tough_enough:thirsty",
-      "tough_enough:heaty"
+      "tough_enough:thirst_manager",
+      "tough_enough:temperature_manager",
+      "tough_enough:debug_monitor"
     ]
   },
   "mixins": [
