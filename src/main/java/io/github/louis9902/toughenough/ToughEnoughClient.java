@@ -5,7 +5,7 @@ import io.github.louis9902.toughenough.client.fluid.WaterTypeRenderer;
 import io.github.louis9902.toughenough.client.hud.DebugHudRenderer;
 import io.github.louis9902.toughenough.client.hud.TemperatureHudRenderer;
 import io.github.louis9902.toughenough.client.hud.ThirstHudRenderer;
-import io.github.louis9902.toughenough.client.item.ThermometerPredicicateProvider;
+import io.github.louis9902.toughenough.client.item.ThermometerPredicateProvider;
 import io.github.louis9902.toughenough.client.screen.ClimatizerScreen;
 import io.github.louis9902.toughenough.fluid.PurifiedWater;
 import io.github.louis9902.toughenough.init.ToughEnoughFluids;
@@ -16,12 +16,10 @@ import io.github.louis9902.toughenough.item.JuiceItem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.object.builder.v1.client.model.FabricModelPredicateProviderRegistry;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.util.Identifier;
@@ -64,7 +62,7 @@ public class ToughEnoughClient implements ClientModInitializer {
 
     private static void registerModelPredicates() {
         FabricModelPredicateProviderRegistry.register(ToughEnough.identifier("empty"), (stack, world, entity) -> CanteenItem.hasFilling(stack) ? 0.0F : 1.0F);
-        FabricModelPredicateProviderRegistry.register(ToughEnough.identifier("temperature"), new ThermometerPredicicateProvider());
+        FabricModelPredicateProviderRegistry.register(ToughEnough.identifier("temperature"), new ThermometerPredicateProvider());
     }
 
     private static void registerColorProviders() {
